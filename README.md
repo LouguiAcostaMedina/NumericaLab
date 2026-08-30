@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Calculadora de Métodos Numéricos
 
-## Getting Started
+Una plataforma web interactiva de última generación para la resolución de ecuaciones no lineales utilizando métodos numéricos iterativos. Diseñada con una estética moderna estilo dashboard, permite a los usuarios calcular raíces, analizar el decaimiento del error porcentual relativo a través de gráficas y exportar reportes de iteraciones a múltiples formatos.
 
-First, run the development server:
+## Características
 
+* **5 Algoritmos Numéricos Implementados**:
+  * **Método de Bisección**: Algoritmo cerrado que divide sucesivamente a la mitad el intervalo que contiene la raíz.
+  * **Método de Falsa Posición**: Algoritmo cerrado basado en interpolación lineal entre extremos.
+  * **Método de Newton-Raphson**: Algoritmo abierto que utiliza la derivada simbólica para una convergencia rápida.
+  * **Método de Punto Fijo**: Algoritmo abierto que resuelve la ecuación a partir de su forma despejada $x = g(x)$.
+  * **Método de la Secante**: Algoritmo abierto que aproxima la derivada usando dos semillas iniciales.
+* **Evaluación Simbólica y Derivación**: Parser matemático avanzado para evaluar expresiones de forma segura y calcular derivadas de forma analítica en el cliente.
+* **Gráficas de Convergencia**: Visualización interactiva del decaimiento del error relativo porcentual ($\varepsilon_a$ vs Iteración) por medio de gráficos de líneas dinámicos.
+* **Exportación Multi-formato**: Descarga de los resultados de las iteraciones en formatos **CSV** (optimizado para Excel), **Excel (.xlsx)** y reporte en **PDF** con formato profesional.
+* **UI/UX Premium**: Soporte responsivo completo para móviles y escritorio, estados activos de sidebar temáticos y Skeleton Loaders durante el procesamiento.
+
+## Stack Tecnológico
+
+* **Core**: [React 19](https://react.dev/) & [Next.js 16](https://nextjs.org/) (App Router)
+* **Lenguaje**: [TypeScript](https://www.typescriptlang.org/)
+* **Estilos**: [Tailwind CSS v4](https://tailwindcss.com/)
+* **Matemáticas**: [mathjs](https://mathjs.org/) (Parser y diferenciación simbólica)
+* **Gráficos**: [Recharts](https://recharts.org/)
+* **Exportación**:
+  * [xlsx](https://www.npmjs.com/package/xlsx) (Generación de hojas de cálculo de Excel)
+  * [jspdf](https://github.com/parallax/jsPDF) & [jspdf-autotable](https://github.com/simonbengtsson/jsPDF-AutoTable) (Generación de reportes PDF estructurados)
+
+## Instalación y Uso Local
+
+Sigue estos pasos para clonar y ejecutar el proyecto en tu máquina local:
+
+### 1. Clonar el repositorio
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/tu-usuario/software-metodos-numericos.git
+cd software-metodos-numericos
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Instalar dependencias
+Instala los paquetes necesarios utilizando npm:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Ejecutar el servidor de desarrollo
+Inicia el entorno de desarrollo local:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+El servidor estará corriendo en [http://localhost:3000](http://localhost:3000). Abre este enlace en tu navegador para ver la aplicación.
 
-## Learn More
+### 4. Compilar para Producción
+Para generar el build optimizado de producción (ideal para desplegar en plataformas como Vercel):
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Despliegue en Vercel
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Este proyecto está configurado para compilarse y desplegarse automáticamente en Vercel mediante su integración con GitHub. Solo conecta tu repositorio a un nuevo proyecto en Vercel y se detectará automáticamente el framework de Next.js.
