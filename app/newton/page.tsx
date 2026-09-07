@@ -5,12 +5,17 @@ import { MethodForm } from '../../components/MethodForm';
 import { ResultsTable } from '../../components/ResultsTable';
 import { ConvergenceChart } from '../../components/ConvergenceChart';
 import { SkeletonLoader } from '../../components/SkeletonLoader';
+import { EducationalModePanel } from '../../components/EducationalModePanel';
+import { MethodComparator } from '../../components/MethodComparator';
 import { calculateNewtonRaphson } from '../../core/math/newton';
+import { EducationalNarrator } from '../../core/math/educationalNarrator';
 import { MathParser } from '../../core/math/MathParser';
+import { HistoryStorage } from '../../core/utils/historyStorage';
 import { NewtonIteration, MethodResponse } from '../../core/domain/types';
 
 export default function NewtonPage() {
   const [result, setResult] = useState<MethodResponse<NewtonIteration> | null>(null);
+  const [currentExpression, setCurrentExpression] = useState<string>('x^3 - x - 1');
   const [derivative, setDerivative] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,16 +25,16 @@ export default function NewtonPage() {
     x0?: number;
     tolerance: number;
     maxIterations: number;
+    decimals?: number;
   }) => {
     setIsLoading(true);
     setErrorMessage(null);
     setResult(null);
     setDerivative(null);
+    setCurrentExpression(data.expression);
 
-    // Timeout ficticio muy pequeño para simular carga y dar fluidez visual a la UI
     setTimeout(() => {
       try {
-        // Obtener derivada simbólica para mostrar al usuario
         const deriv = MathParser.derivative(data.expression, 'x');
         setDerivative(deriv);
 
@@ -37,14 +42,28 @@ export default function NewtonPage() {
           data.expression,
           data.x0!,
           data.tolerance,
-          data.maxIterations
+          data.maxIterations,
+          data.decimals ?? 6
         );
 
         if (response.success) {
           setResult(response);
+          HistoryStorage.addEntry({
+            methodId: 'newton',
+            methodName: 'Newton-Raphson',
+            expression: data.expression,
+            params: {
+              x0: data.x0,
+              tolerance: data.tolerance,
+              maxIterations: data.maxIterations,
+              decimals: data.decimals ?? 6,
+            },
+            rootSummary: response.root !== undefined ? response.root.toString() : undefined,
+            iterationsCount: response.iterations?.length,
+            success: true,
+          });
         } else {
           setErrorMessage(response.errorMessage || 'Error desconocido.');
-          // Si el cálculo falló a mitad, puede contener algunas iteraciones que queremos mostrar
           if (response.iterations && response.iterations.length > 0) {
             setResult(response);
           }
@@ -54,12 +73,12 @@ export default function NewtonPage() {
       } finally {
         setIsLoading(false);
       }
-    }, 600);
+    }, 200);
   };
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
+    <div className="space-y-8 animate-fade-in pb-12">
+      {/* Encabezado */}
       <div>
         <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-100 dark:bg-blue-950/40 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-900/30">
           Método Abierto
@@ -73,22 +92,18 @@ export default function NewtonPage() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8 items-start">
-        {/* Form Column */}
+        {/* Formulario */}
         <div className="lg:col-span-1">
-          <MethodForm
-            method="newton"
-            isLoading={isLoading}
-            onSubmit={handleCalculate}
-          />
+          <MethodForm method="newton" isLoading={isLoading} onSubmit={handleCalculate} />
         </div>
 
-        {/* Results / Info Column */}
+        {/* Resultados */}
         <div className="lg:col-span-2 space-y-6">
           {isLoading ? (
             <SkeletonLoader type="both" />
           ) : (
             <>
-              {/* Error Alert */}
+              {/* Alerta de Error */}
               {errorMessage && (
                 <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 text-red-700 dark:text-red-400 p-5 rounded-xl flex items-start gap-4">
                   <span className="text-2xl mt-0.5">⚠️</span>
@@ -99,7 +114,7 @@ export default function NewtonPage() {
                 </div>
               )}
 
-              {/* Success summary card */}
+              {/* Tarjeta de Raíz */}
               {result && result.root !== undefined && (
                 <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/30 text-blue-900 dark:text-blue-400 p-6 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-sm">
                   <div className="space-y-1">
@@ -107,7 +122,7 @@ export default function NewtonPage() {
                       Raíz Aproximada Encontrada
                     </h4>
                     <p className="text-3xl font-extrabold font-mono text-zinc-950 dark:text-white mt-1">
-                      {result.root.toFixed(8)}
+                      {result.root.toFixed(result.precisionConfig?.decimals || 6)}
                     </p>
                     {derivative && (
                       <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 font-mono">
@@ -128,29 +143,25 @@ export default function NewtonPage() {
                 </div>
               )}
 
-              {/* Results Table */}
-              {result && result.iterations && (
-                <ResultsTable
-                  type="newton"
-                  data={result.iterations}
+              {/* Modo Educativo Narrativo */}
+              {result && (
+                <EducationalModePanel
+                  narrative={EducationalNarrator.narrateRealMethod('newton', result, currentExpression)}
                 />
               )}
 
-              {/* Convergence Chart */}
+              {/* Tabla de Iteraciones */}
               {result && result.iterations && (
-                <ConvergenceChart
-                  methodType="newton"
-                  data={result.iterations}
-                />
+                <ResultsTable type="newton" data={result.iterations} />
               )}
 
-              {/* Info Card when empty */}
-              {!result && !errorMessage && (
-                <div className="bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 rounded-xl p-8 text-center text-zinc-500">
-                  <span className="text-3xl block mb-2">📊</span>
-                  Ingresa los parámetros y haz clic en calcular para ver los resultados e iteraciones.
-                </div>
+              {/* Gráfico de Decaimiento del Error */}
+              {result && result.iterations && (
+                <ConvergenceChart methodType="newton" data={result.iterations} />
               )}
+
+              {/* Comparador Simultáneo de Métodos */}
+              <MethodComparator initialExpression={currentExpression} />
             </>
           )}
         </div>

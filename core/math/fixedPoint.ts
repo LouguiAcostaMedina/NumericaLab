@@ -1,5 +1,7 @@
 import { FixedPointIteration, MethodResponse } from '../domain/types';
 import { MathParser } from './MathParser';
+import { MethodRecommender } from './methodRecommender';
+import { PrecisionUtils } from './precisionUtils';
 
 /**
  * Resuelve la raíz de una ecuación usando el método de Punto Fijo.
@@ -9,20 +11,26 @@ import { MathParser } from './MathParser';
  * @param x0 Valor semilla inicial
  * @param tolerance Tolerancia del error relativo porcentual (%)
  * @param maxIterations Número máximo de iteraciones
- * @returns Estructura MethodResponse con la raíz y el desglose de iteraciones
+ * @param decimals Precisión decimal (6, 8, 10, 12)
  */
 export function calculateFixedPoint(
   gExpression: string,
   x0: number,
   tolerance: number,
-  maxIterations: number
+  maxIterations: number,
+  decimals: number = 6
 ): MethodResponse<FixedPointIteration> {
+  const recommendation = MethodRecommender.recommend(gExpression, { x0, gExpression });
+  const semanticValidation = MathParser.validateSemantic(gExpression, 'fixed-point', { x0, gExpression });
+
   try {
-    // Validación de entradas
     if (maxIterations <= 0) {
       return {
         success: false,
         errorMessage: 'El número máximo de iteraciones debe ser un entero mayor que cero.',
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
@@ -30,6 +38,9 @@ export function calculateFixedPoint(
       return {
         success: false,
         errorMessage: 'La tolerancia debe ser un número positivo mayor que cero.',
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
@@ -37,7 +48,7 @@ export function calculateFixedPoint(
     let xi = x0;
     let gxi = 0;
     let error: number | null = null;
-    let hasConverged = false;
+    const eps = PrecisionUtils.getEpsilon(decimals);
 
     for (let iter = 1; iter <= maxIterations; iter++) {
       try {
@@ -45,60 +56,60 @@ export function calculateFixedPoint(
       } catch (err: any) {
         return {
           success: false,
-          errorMessage: `Error al evaluar g(x) en x = ${xi}. Detalle: ${err.message}`,
+          errorMessage: `Error al evaluar g(x) en x = ${PrecisionUtils.format(xi, decimals)}. Detalle: ${err.message}`,
           iterations,
+          precisionConfig: { decimals },
+          semanticValidation,
+          recommendation,
         };
       }
 
-      // Validar divergencia extrema (valores no reales, infinitos o indeterminados)
       if (isNaN(gxi) || !isFinite(gxi) || Math.abs(gxi) > 1e15) {
         return {
           success: false,
-          errorMessage: `El método de Punto Fijo divergió abruptamente en la iteración ${iter} (x_i = ${xi}, g(x_i) = ${gxi}).`,
+          errorMessage: `El método de Punto Fijo divergió en la iteración ${iter} (x_i = ${PrecisionUtils.format(xi, decimals)}, g(x_i) = ${PrecisionUtils.format(gxi, decimals)}).`,
           iterations,
+          precisionConfig: { decimals },
+          semanticValidation,
+          recommendation,
         };
       }
 
-      // Calcular error relativo porcentual aproximado
       if (gxi !== 0) {
-        error = Math.abs((gxi - xi) / gxi) * 100;
+        error = PrecisionUtils.round(Math.abs((gxi - xi) / gxi) * 100, decimals);
       } else {
         error = 0;
       }
 
       iterations.push({
         iteration: iter,
-        xi,
-        gxi,
+        xi: PrecisionUtils.round(xi, decimals),
+        gxi: PrecisionUtils.round(gxi, decimals),
         error,
       });
 
-      // Criterios de parada
-      // 1. Tolerancia alcanzada
-      if (error < tolerance) {
-        hasConverged = true;
+      if (error < tolerance || Math.abs(gxi - xi) < eps) {
         break;
       }
 
-      // 2. Convergencia exacta (punto fijo perfecto g(x) = x)
-      if (Math.abs(gxi - xi) < 1e-15) {
-        hasConverged = true;
-        break;
-      }
-
-      // Actualizar xi para la siguiente iteración
       xi = gxi;
     }
 
     return {
       success: true,
-      root: gxi,
+      root: PrecisionUtils.round(gxi, decimals),
       iterations,
+      precisionConfig: { decimals },
+      semanticValidation,
+      recommendation,
     };
   } catch (error: any) {
     return {
       success: false,
       errorMessage: error.message || 'Error inesperado durante el cálculo por Punto Fijo.',
+      precisionConfig: { decimals },
+      semanticValidation,
+      recommendation,
     };
   }
 }

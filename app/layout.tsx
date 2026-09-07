@@ -83,6 +83,17 @@ export default function RootLayout({
                 </SidebarLink>
               </div>
             </div>
+
+            <div>
+              <p className="px-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">
+                Métodos Polinómicos
+              </p>
+              <div className="space-y-1">
+                <SidebarLink href="/polynomials" activeColor="cyan">
+                  🎯 Müller & Filtros IIR
+                </SidebarLink>
+              </div>
+            </div>
           </nav>
 
           {/* Sidebar Footer */}

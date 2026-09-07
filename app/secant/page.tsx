@@ -19,6 +19,7 @@ export default function SecantPage() {
     x1?: number;
     tolerance: number;
     maxIterations: number;
+    decimals?: number;
   }) => {
     setIsLoading(true);
     setErrorMessage(null);
@@ -31,7 +32,8 @@ export default function SecantPage() {
           data.x0!,
           data.x1!,
           data.tolerance,
-          data.maxIterations
+          data.maxIterations,
+          data.decimals ?? 6
         );
 
         if (response.success) {
@@ -47,7 +49,7 @@ export default function SecantPage() {
       } finally {
         setIsLoading(false);
       }
-    }, 600);
+    }, 200);
   };
 
   return (

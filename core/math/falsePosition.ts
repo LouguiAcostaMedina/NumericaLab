@@ -1,5 +1,7 @@
 import { FalsePositionIteration, MethodResponse } from '../domain/types';
 import { MathParser } from './MathParser';
+import { MethodRecommender } from './methodRecommender';
+import { PrecisionUtils } from './precisionUtils';
 
 /**
  * Resuelve la raíz de una función usando el método de Falsa Posición.
@@ -9,24 +11,30 @@ import { MathParser } from './MathParser';
  * @param xuInitial Límite superior del intervalo (xu)
  * @param tolerance Tolerancia del error relativo porcentual (%)
  * @param maxIterations Número máximo de iteraciones
- * @returns Estructura MethodResponse con la raíz y el desglose de iteraciones
+ * @param decimals Precisión decimal (6, 8, 10, 12)
  */
 export function calculateFalsePosition(
   expression: string,
   xlInitial: number,
   xuInitial: number,
   tolerance: number,
-  maxIterations: number
+  maxIterations: number,
+  decimals: number = 6
 ): MethodResponse<FalsePositionIteration> {
+  const recommendation = MethodRecommender.recommend(expression, { a: xlInitial, b: xuInitial });
+  const semanticValidation = MathParser.validateSemantic(expression, 'false-position', { a: xlInitial, b: xuInitial });
+
   try {
     let xl = xlInitial;
     let xu = xuInitial;
 
-    // Validación de entradas
     if (maxIterations <= 0) {
       return {
         success: false,
         errorMessage: 'El número máximo de iteraciones debe ser un entero mayor que cero.',
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
@@ -34,6 +42,9 @@ export function calculateFalsePosition(
       return {
         success: false,
         errorMessage: 'La tolerancia debe ser un número positivo mayor que cero.',
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
@@ -41,57 +52,66 @@ export function calculateFalsePosition(
       return {
         success: false,
         errorMessage: 'El límite inferior "xl" debe ser menor que el límite superior "xu".',
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
-    // Evaluar extremos iniciales
     let fxl = MathParser.evaluate(expression, { x: xl });
     let fxu = MathParser.evaluate(expression, { x: xu });
 
-    // Comprobar si los extremos ya son raíces exactas
     if (fxl === 0) {
       return {
         success: true,
-        root: xl,
+        root: PrecisionUtils.round(xl, decimals),
         iterations: [
           {
             iteration: 1,
-            xl,
-            xu,
-            xr: xl,
-            fxl,
-            fxu,
-            fxr: fxl,
+            xl: PrecisionUtils.round(xl, decimals),
+            xu: PrecisionUtils.round(xu, decimals),
+            xr: PrecisionUtils.round(xl, decimals),
+            fxl: PrecisionUtils.round(fxl, decimals),
+            fxu: PrecisionUtils.round(fxu, decimals),
+            fxr: PrecisionUtils.round(fxl, decimals),
             error: 0,
           },
         ],
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
     if (fxu === 0) {
       return {
         success: true,
-        root: xu,
+        root: PrecisionUtils.round(xu, decimals),
         iterations: [
           {
             iteration: 1,
-            xl,
-            xu,
-            xr: xu,
-            fxl,
-            fxu,
-            fxr: fxu,
+            xl: PrecisionUtils.round(xl, decimals),
+            xu: PrecisionUtils.round(xu, decimals),
+            xr: PrecisionUtils.round(xu, decimals),
+            fxl: PrecisionUtils.round(fxl, decimals),
+            fxu: PrecisionUtils.round(fxu, decimals),
+            fxr: PrecisionUtils.round(fxu, decimals),
             error: 0,
           },
         ],
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
-    // Teorema de Bolzano: f(xl) y f(xu) deben cambiar de signo
     if (Math.sign(fxl) === Math.sign(fxu)) {
       return {
         success: false,
-        errorMessage: `El intervalo [${xl}, ${xu}] no cumple con el Teorema del Valor Intermedio. f(xl) = ${fxl.toFixed(6)}, f(xu) = ${fxu.toFixed(6)}. Se requiere cambio de signo.`,
+        errorMessage: `El intervalo [${xl}, ${xu}] no cumple con el Teorema del Valor Intermedio. f(xl) = ${PrecisionUtils.format(fxl, decimals)}, f(xu) = ${PrecisionUtils.format(fxu, decimals)}. Se requiere cambio de signo.`,
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
@@ -100,29 +120,30 @@ export function calculateFalsePosition(
     let xrOld = 0;
     let error: number | null = null;
     let fxr = 0;
+    const eps = PrecisionUtils.getEpsilon(decimals);
 
     for (let iter = 1; iter <= maxIterations; iter++) {
       const denominator = fxl - fxu;
 
-      // Evitar división por cero
       if (Math.abs(denominator) < 1e-15) {
         return {
           success: false,
-          errorMessage: `El método de Falsa Posición falló por división por cero en la iteración ${iter}. f(xl) = ${fxl}, f(xu) = ${fxu}.`,
+          errorMessage: `El método de Falsa Posición falló por división por cero en la iteración ${iter}. f(xl) = ${PrecisionUtils.format(fxl, decimals)}, f(xu) = ${PrecisionUtils.format(fxu, decimals)}.`,
           iterations,
+          precisionConfig: { decimals },
+          semanticValidation,
+          recommendation,
         };
       }
 
-      // Fórmula de Falsa Posición
       xr = xu - (fxu * (xl - xu)) / denominator;
       fxr = MathParser.evaluate(expression, { x: xr });
 
-      // Calcular error relativo porcentual aproximado
       if (iter > 1) {
         if (xr !== 0) {
-          error = Math.abs((xr - xrOld) / xr) * 100;
+          error = PrecisionUtils.round(Math.abs((xr - xrOld) / xr) * 100, decimals);
         } else {
-          error = 0; // Evitar división por cero si xr es exactamente cero
+          error = 0;
         }
       } else {
         error = null;
@@ -130,26 +151,23 @@ export function calculateFalsePosition(
 
       iterations.push({
         iteration: iter,
-        xl,
-        xu,
-        xr,
-        fxl,
-        fxu,
-        fxr,
+        xl: PrecisionUtils.round(xl, decimals),
+        xu: PrecisionUtils.round(xu, decimals),
+        xr: PrecisionUtils.round(xr, decimals),
+        fxl: PrecisionUtils.round(fxl, decimals),
+        fxu: PrecisionUtils.round(fxu, decimals),
+        fxr: PrecisionUtils.round(fxr, decimals),
         error,
       });
 
-      // Criterios de parada
-      // 1. Tolerancia alcanzada
       if (error !== null && error < tolerance) {
         break;
       }
-      // 2. Raíz exacta encontrada
-      if (Math.abs(fxr) < 1e-15) {
+
+      if (Math.abs(fxr) < eps) {
         break;
       }
 
-      // Actualizar el intervalo según el cambio de signo
       if (Math.sign(fxl) * Math.sign(fxr) < 0) {
         xu = xr;
         fxu = fxr;
@@ -163,13 +181,19 @@ export function calculateFalsePosition(
 
     return {
       success: true,
-      root: xr,
+      root: PrecisionUtils.round(xr, decimals),
       iterations,
+      precisionConfig: { decimals },
+      semanticValidation,
+      recommendation,
     };
   } catch (error: any) {
     return {
       success: false,
       errorMessage: error.message || 'Error inesperado durante el cálculo por Falsa Posición.',
+      precisionConfig: { decimals },
+      semanticValidation,
+      recommendation,
     };
   }
 }

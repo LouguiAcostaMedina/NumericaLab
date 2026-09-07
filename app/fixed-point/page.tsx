@@ -18,6 +18,7 @@ export default function FixedPointPage() {
     x0?: number;
     tolerance: number;
     maxIterations: number;
+    decimals?: number;
   }) => {
     setIsLoading(true);
     setErrorMessage(null);
@@ -29,7 +30,8 @@ export default function FixedPointPage() {
           data.expression,
           data.x0!,
           data.tolerance,
-          data.maxIterations
+          data.maxIterations,
+          data.decimals ?? 6
         );
 
         if (response.success) {
@@ -45,7 +47,7 @@ export default function FixedPointPage() {
       } finally {
         setIsLoading(false);
       }
-    }, 600);
+    }, 200);
   };
 
   return (

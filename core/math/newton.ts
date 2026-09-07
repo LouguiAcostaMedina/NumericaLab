@@ -1,5 +1,7 @@
 import { NewtonIteration, MethodResponse } from '../domain/types';
 import { MathParser } from './MathParser';
+import { MethodRecommender } from './methodRecommender';
+import { PrecisionUtils } from './precisionUtils';
 
 /**
  * Resuelve la raíz de una función usando el método de Newton-Raphson.
@@ -8,20 +10,37 @@ import { MathParser } from './MathParser';
  * @param x0 Valor inicial (semilla)
  * @param tolerance Tolerancia del error relativo porcentual (%)
  * @param maxIterations Número máximo de iteraciones
- * @returns Estructura MethodResponse con la raíz y el desglose de iteraciones
+ * @param decimals Precisión decimal (6, 8, 10, 12)
  */
 export function calculateNewtonRaphson(
   expression: string,
   x0: number,
   tolerance: number,
-  maxIterations: number
+  maxIterations: number,
+  decimals: number = 6
 ): MethodResponse<NewtonIteration> {
+  // Generar recomendación y validación semántica algorítmica previa
+  const recommendation = MethodRecommender.recommend(expression, { x0 });
+  const semanticValidation = MathParser.validateSemantic(expression, 'newton', { x0 });
+
+  if (semanticValidation.severity === 'error') {
+    return {
+      success: false,
+      errorMessage: semanticValidation.message,
+      precisionConfig: { decimals },
+      semanticValidation,
+      recommendation,
+    };
+  }
+
   try {
-    // Validación de entradas básicas
     if (maxIterations <= 0) {
       return {
         success: false,
         errorMessage: 'El número máximo de iteraciones debe ser un entero mayor que cero.',
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
@@ -29,10 +48,12 @@ export function calculateNewtonRaphson(
       return {
         success: false,
         errorMessage: 'La tolerancia debe ser un número positivo mayor que cero.',
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
-    // Calcular la derivada simbólica
     let derivativeExpression: string;
     try {
       derivativeExpression = MathParser.derivative(expression, 'x');
@@ -40,6 +61,9 @@ export function calculateNewtonRaphson(
       return {
         success: false,
         errorMessage: `No se pudo calcular la derivada simbólica de la función. Detalle: ${err.message}`,
+        precisionConfig: { decimals },
+        semanticValidation,
+        recommendation,
       };
     }
 
@@ -47,67 +71,63 @@ export function calculateNewtonRaphson(
     let xi = x0;
     let xiNext = 0;
     let error: number | null = null;
-    let hasConverged = false;
+    const eps = PrecisionUtils.getEpsilon(decimals);
 
     for (let iter = 1; iter <= maxIterations; iter++) {
       const fxi = MathParser.evaluate(expression, { x: xi });
       const dfxi = MathParser.evaluate(derivativeExpression, { x: xi });
 
-      // Control de excepciones: división por cero o derivada extremadamente cercana a cero
       if (Math.abs(dfxi) < 1e-15) {
         return {
           success: false,
-          errorMessage: `El método de Newton-Raphson falló debido a que la derivada evaluada es cero o extremadamente cercana a cero (f'(xi) = ${dfxi}) en la iteración ${iter} (x = ${xi}). Se detuvo para evitar división por cero.`,
-          iterations, // Devolvemos las iteraciones calculadas hasta ahora
+          errorMessage: `El método de Newton-Raphson falló debido a que la derivada evaluada es cero (f'(xi) = ${dfxi}) en x = ${PrecisionUtils.round(xi, decimals)}. Se detuvo para evitar división por cero.`,
+          iterations,
+          precisionConfig: { decimals },
+          semanticValidation,
+          recommendation,
         };
       }
 
-      // Calcular el siguiente valor aproximado
       xiNext = xi - fxi / dfxi;
 
-      // Calcular el error relativo porcentual aproximado
       if (xiNext !== 0) {
-        error = Math.abs((xiNext - xi) / xiNext) * 100;
+        error = PrecisionUtils.round(Math.abs((xiNext - xi) / xiNext) * 100, decimals);
       } else {
-        error = 0; // Evitar división por cero si xiNext es exactamente cero
+        error = 0;
       }
 
       iterations.push({
         iteration: iter,
-        xi,
-        fxi,
-        dfxi,
-        xiNext,
+        xi: PrecisionUtils.round(xi, decimals),
+        fxi: PrecisionUtils.round(fxi, decimals),
+        dfxi: PrecisionUtils.round(dfxi, decimals),
+        xiNext: PrecisionUtils.round(xiNext, decimals),
         error,
       });
 
-      // Criterios de parada
-      // 1. Si fxi es prácticamente cero (raíz exacta encontrada en xi)
-      if (Math.abs(fxi) < 1e-15) {
-        xiNext = xi; // La raíz es xi
-        hasConverged = true;
+      if (Math.abs(fxi) < eps || (error !== null && error < tolerance)) {
+        xiNext = PrecisionUtils.round(xiNext, decimals);
         break;
       }
 
-      // 2. Si el error porcentual es menor que la tolerancia
-      if (error < tolerance) {
-        hasConverged = true;
-        break;
-      }
-
-      // Actualizar xi para la siguiente iteración
       xi = xiNext;
     }
 
     return {
       success: true,
-      root: xiNext,
+      root: PrecisionUtils.round(xiNext, decimals),
       iterations,
+      precisionConfig: { decimals },
+      semanticValidation,
+      recommendation,
     };
   } catch (error: any) {
     return {
       success: false,
       errorMessage: error.message || 'Error inesperado durante el cálculo por Newton-Raphson.',
+      precisionConfig: { decimals },
+      semanticValidation,
+      recommendation,
     };
   }
 }

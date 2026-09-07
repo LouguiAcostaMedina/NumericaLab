@@ -25,6 +25,37 @@ export interface NewtonIteration {
 }
 
 /**
+ * Configuración de precisión decimal para cálculos y renderizado.
+ */
+export interface PrecisionConfig {
+  decimals: number; // 6, 8, 10, 12, etc. (default: 6)
+  useScientificNotation?: boolean;
+}
+
+/**
+ * Resultado de validación semántica algorítmica previa a la ejecución.
+ */
+export interface SemanticValidationResult {
+  isValid: boolean;
+  severity: 'error' | 'warning' | 'info';
+  message: string;
+  suggestion?: string;
+  details?: Record<string, any>;
+}
+
+/**
+ * Recomendación automática del método numérico ideal según la función y parámetros.
+ */
+export interface MethodRecommendation {
+  recommendedMethodId: string;
+  recommendedMethodName: string;
+  confidence: 'alta' | 'media' | 'baja';
+  reason: string;
+  alternativeMethodId?: string;
+  alternativeMethodName?: string;
+}
+
+/**
  * Estructura de respuesta estándar para cualquier método numérico.
  */
 export interface MethodResponse<T> {
@@ -32,6 +63,9 @@ export interface MethodResponse<T> {
   root?: number;
   iterations?: T[];
   errorMessage?: string;
+  precisionConfig?: PrecisionConfig;
+  semanticValidation?: SemanticValidationResult;
+  recommendation?: MethodRecommendation;
 }
 
 /**
@@ -70,3 +104,97 @@ export interface SecantIteration {
   xiNext: number;    // x_{i+1} (siguiente aproximación)
   error: number | null; // Error relativo porcentual aproximado (%)
 }
+
+/**
+ * Representa un número complejo en formato rectangular (re + im*i).
+ */
+export interface ComplexNumber {
+  re: number;
+  im: number;
+}
+
+/**
+ * Resultado del análisis de la Regla de los Signos de Descartes.
+ */
+export interface DescartesResult {
+  signChangesP: number;        // Variaciones de signo en P(x)
+  signChangesPNeg: number;     // Variaciones de signo en P(-x)
+  maxPositiveRoots: number;    // Máximo número de raíces reales positivas
+  positiveRootsPossibilities: number[]; // Posibilidades de raíces reales positivas (ej: [3, 1])
+  maxNegativeRoots: number;    // Máximo número de raíces reales negativas
+  negativeRootsPossibilities: number[]; // Posibilidades de raíces reales negativas (ej: [2, 0])
+  zeroRootsCount: number;      // Número de raíces en x = 0
+  minComplexRoots: number;     // Mínimo número de raíces complejas esperadas
+  degree: number;              // Grado del polinomio
+}
+
+/**
+ * Resultado del cálculo de Cotas de Lagrange y Cauchy para delimitar las raíces.
+ */
+export interface LagrangeBoundResult {
+  lagrangeUpperReal: number;   // Cota superior de Lagrange para raíces reales positivas B = 1 + (K/an)^(1/k)
+  lagrangeLowerReal: number;   // Cota inferior de Lagrange para raíces reales negativas
+  cauchyRadius: number;        // Radio global de Cauchy R = 1 + max(|ai|)/|an| en el plano complejo
+  globalBound: number;         // Cota global recomendada para la región del plano complejo
+}
+
+/**
+ * Representa una iteración individual del método de Müller.
+ */
+export interface MullerIteration {
+  iteration: number;
+  z0: ComplexNumber;
+  z1: ComplexNumber;
+  z2: ComplexNumber;
+  z3: ComplexNumber;
+  fz3: ComplexNumber;
+  a: ComplexNumber;
+  b: ComplexNumber;
+  c: ComplexNumber;
+  discriminant: ComplexNumber;
+  error: number | null;       // Error relativo porcentual aproximado (%)
+}
+
+/**
+ * Resultado individual de una raíz encontrada por Müller (con deflación).
+ */
+export interface PolynomialRoot {
+  rootIndex: number;           // Índice de la raíz (1..n)
+  root: ComplexNumber;         // Valor numérico de la raíz hallada
+  magnitude: number;           // Módulo |z|
+  iterations: MullerIteration[]; // Historial de iteraciones hasta la convergencia
+  converged: boolean;
+  deflatedCoefficients?: (number | ComplexNumber)[]; // Coeficientes tras deflación
+}
+
+/**
+ * Respuesta completa de la solución de un polinomio de grado n.
+ */
+export interface PolynomialSolverResult {
+  success: boolean;
+  polynomialString: string;
+  coefficients: number[];
+  degree: number;
+  descartes: DescartesResult;
+  lagrange: LagrangeBoundResult;
+  roots: PolynomialRoot[];
+  errorMessage?: string;
+  executionTimeMs?: number;
+}
+
+/**
+ * Resultado del análisis de estabilidad para Filtro Digital IIR.
+ */
+export interface IIRFilterStabilityResult {
+  filterName: string;
+  denominatorCoefficients: number[];
+  degree: number;
+  poles: PolynomialRoot[];
+  maxMagnitude: number;
+  isStable: boolean;
+  stabilityStatus: 'ESTABLE' | 'MARGINALMENTE_ESTABLE' | 'INESTABLE';
+  summary: string;
+  descartes: DescartesResult;
+  lagrange: LagrangeBoundResult;
+}
+

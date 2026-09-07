@@ -137,6 +137,30 @@ export default function Home() {
             </Link>
           </div>
         </div>
+
+        {/* Method 6: Müller & Polynomial Roots */}
+        <div className="bg-gradient-to-br from-zinc-900 to-cyan-950 text-white rounded-xl p-6 border border-cyan-500/30 shadow-lg flex flex-col justify-between hover:shadow-cyan-500/10 transition-all duration-200 col-span-1 md:col-span-2 lg:col-span-1">
+          <div className="space-y-3">
+            <div className="w-12 h-12 bg-cyan-500/20 text-cyan-400 rounded-lg flex items-center justify-center text-2xl font-bold border border-cyan-500/30">
+              🎯
+            </div>
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <span>Müller & Filtros IIR</span>
+              <span className="text-[10px] bg-cyan-500/30 text-cyan-300 px-2 py-0.5 rounded-full font-mono uppercase">Nuevo</span>
+            </h3>
+            <p className="text-zinc-300 text-sm leading-relaxed">
+              Encuentra raíces reales y complejas mediante parabolas interpolantes. Incluye acotación de Lagrange, Descartes, deflación de Horner y análisis de estabilidad para filtros IIR (|z| &lt; 1).
+            </p>
+          </div>
+          <div className="mt-6 pt-4 border-t border-zinc-800">
+            <Link
+              href="/polynomials"
+              className="inline-flex items-center gap-2 text-sm font-bold text-cyan-400 hover:text-cyan-300"
+            >
+              Iniciar Análisis Complejo →
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Instructions / Summary */}
