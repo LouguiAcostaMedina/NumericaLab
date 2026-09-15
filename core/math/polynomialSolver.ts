@@ -1,5 +1,5 @@
 import * as math from 'mathjs';
-import { ComplexNumber, PolynomialRoot, PolynomialSolverResult } from '../domain/types';
+import { ComplexNumber, PolynomialRoot, PolynomialSolverResult, MullerIteration, SeedsInput } from '../domain/types';
 import { ComplexUtils } from './complexUtils';
 import { DescartesLagrange } from './descartesLagrange';
 import { HornerScheme } from './horner';
@@ -8,7 +8,7 @@ import { PrecisionUtils } from './precisionUtils';
 
 /**
  * Orquestador completo para la resolución de Polinomios de grado n.
- * Combina Regla de Descartes, Cotas de Lagrange, Método de Müller y Deflación de Horner.
+ * Combina Regla de Descartes, Cotas de Lagrange, Método de Müller y Deflación de Horner con Purificación de Raíces.
  */
 export class PolynomialSolver {
   /**
@@ -18,7 +18,8 @@ export class PolynomialSolver {
     coeffs: number[],
     tolerance: number = 1e-6,
     maxIterations: number = 100,
-    decimals: number = 6
+    decimals: number = 6,
+    seedsInput?: SeedsInput
   ): PolynomialSolverResult {
     const startTime = performance.now();
 
@@ -48,21 +49,83 @@ export class PolynomialSolver {
     const descartes = DescartesLagrange.analyzeDescartes(cleanCoeffs);
     const lagrange = DescartesLagrange.calculateBounds(cleanCoeffs);
 
-    // 2. Fases 2 y 3: Müller + Deflación Sintética de Horner
+    // 2. Fases 2 y 3: Müller + Deflación Sintética de Horner + Purificación
     const roots: PolynomialRoot[] = [];
     let currentCoeffs: (number | ComplexNumber)[] = [...cleanCoeffs];
 
     // Puntos semilla ajustables basados en la cota de Lagrange
     const bound = Math.max(1, lagrange.globalBound);
+    const useCustom = Boolean(seedsInput?.useCustomSeeds);
 
     for (let rIdx = 1; rIdx <= degree; rIdx++) {
-      // Definir semillas variadas para evitar converger a la misma raíz
-      const angle0 = ((rIdx * 2 * Math.PI) / degree) - Math.PI / 4;
-      const angle2 = angle0 + (2 * Math.PI) / 3;
+      const remainingDegree = currentCoeffs.length - 1;
 
-      const z0: ComplexNumber = { re: -bound * 0.5 * Math.cos(angle0), im: bound * 0.5 * Math.sin(angle0) };
-      const z1: ComplexNumber = { re: 0, im: 0 };
-      const z2: ComplexNumber = { re: bound * 0.5 * Math.cos(angle2), im: bound * 0.5 * Math.sin(angle2) };
+      // CASO ESPECIAL CRÍTICO: Deflación a grado 1 (A*z + B = 0 => z = -B/A exacto)
+      if (remainingDegree === 1) {
+        const A = ComplexUtils.toComplex(currentCoeffs[0]);
+        const B = ComplexUtils.toComplex(currentCoeffs[1]);
+
+        // Raíz analítica directa exacta: z = -B / A
+        const negB = ComplexUtils.mul(-1, B);
+        const exactRoot = ComplexUtils.div(negB, A);
+        let cleanedRoot = PrecisionUtils.cleanComplex(exactRoot, decimals);
+
+        // Purificación final sobre el polinomio original
+        cleanedRoot = this.purifyRoot(cleanCoeffs, cleanedRoot, decimals);
+
+        const fzExact = HornerScheme.evaluate(cleanCoeffs, cleanedRoot);
+
+        const iterationItem: MullerIteration = {
+          iteration: 1,
+          z0: cleanedRoot,
+          z1: cleanedRoot,
+          z2: cleanedRoot,
+          z3: cleanedRoot,
+          fz3: PrecisionUtils.cleanComplex(fzExact, decimals),
+          a: { re: 0, im: 0 },
+          b: PrecisionUtils.cleanComplex(A, decimals),
+          c: PrecisionUtils.cleanComplex(B, decimals),
+          discriminant: { re: 0, im: 0 },
+          error: 0.0, // Error 0% garantizado para el residuo lineal
+        };
+
+        const rootRes: PolynomialRoot = {
+          rootIndex: rIdx,
+          root: cleanedRoot,
+          magnitude: PrecisionUtils.round(ComplexUtils.abs(cleanedRoot), decimals),
+          iterations: [iterationItem],
+          converged: true,
+          deflatedCoefficients: [],
+          isPurified: true,
+        };
+
+        roots.push(rootRes);
+        break;
+      }
+
+      // CASO GENERAL: Grado >= 2
+      let z0: ComplexNumber;
+      let z1: ComplexNumber;
+      let z2: ComplexNumber;
+
+      if (rIdx === 1 && useCustom) {
+        // Usar estrictamente las semillas ingresadas por el usuario
+        const seed0 = seedsInput?.z0 ?? seedsInput?.x0 ?? 0;
+        const seed1 = seedsInput?.z1 ?? seedsInput?.x1 ?? 0.5;
+        const seed2 = seedsInput?.z2 ?? seedsInput?.x2 ?? 1.0;
+
+        z0 = ComplexUtils.toComplex(seed0);
+        z1 = ComplexUtils.toComplex(seed1);
+        z2 = ComplexUtils.toComplex(seed2);
+      } else {
+        // Autogeneración usando distribución angular sobre la cota de Lagrange
+        const angle0 = ((rIdx * 2 * Math.PI) / degree) - Math.PI / 4;
+        const angle2 = angle0 + (2 * Math.PI) / 3;
+
+        z0 = { re: -bound * 0.5 * Math.cos(angle0), im: bound * 0.5 * Math.sin(angle0) };
+        z1 = { re: 0, im: 0 };
+        z2 = { re: bound * 0.5 * Math.cos(angle2), im: bound * 0.5 * Math.sin(angle2) };
+      }
 
       // Buscar raíz individual con Müller
       const rootRes = MullerMethod.findSingleRoot(
@@ -76,10 +139,13 @@ export class PolynomialSolver {
         decimals
       );
 
-      // Limpieza de tolerancia para números casi reales
+      // Limpieza y purificación de la raíz encontrada sobre el polinomio original
       let cleanedRoot = PrecisionUtils.cleanComplex(rootRes.root, decimals);
+      cleanedRoot = this.purifyRoot(cleanCoeffs, cleanedRoot, decimals);
+
       rootRes.root = cleanedRoot;
       rootRes.magnitude = PrecisionUtils.round(ComplexUtils.abs(cleanedRoot), decimals);
+      rootRes.isPurified = true;
 
       // Deflactar el polinomio si aún quedan raíces por encontrar
       if (currentCoeffs.length > 2) {
@@ -106,17 +172,59 @@ export class PolynomialSolver {
   }
 
   /**
+   * Purifica una raíz encontrada ejecutando un refinamiento sobre el polinomio original P(z)
+   * para mitigar la propagación de errores numéricos por deflación sintética sucesiva.
+   */
+  static purifyRoot(
+    originalCoeffs: (number | ComplexNumber)[],
+    root: ComplexNumber,
+    decimals: number = 6
+  ): ComplexNumber {
+    const fzInitial = HornerScheme.evaluate(originalCoeffs, root);
+    if (ComplexUtils.abs(fzInitial) < 1e-12) {
+      return PrecisionUtils.cleanComplex(root, decimals);
+    }
+
+    const mag = ComplexUtils.abs(root);
+    const delta = mag > 1e-4 ? mag * 1e-5 : 1e-5;
+
+    const z0 = ComplexUtils.add(root, { re: delta, im: delta * 0.05 });
+    const z1 = ComplexUtils.sub(root, { re: delta, im: -delta * 0.05 });
+    const z2 = root;
+
+    const refined = MullerMethod.findSingleRoot(
+      originalCoeffs,
+      z0,
+      z1,
+      z2,
+      Math.pow(10, -(decimals + 3)),
+      3,
+      1,
+      decimals + 2
+    );
+
+    const fzRefined = HornerScheme.evaluate(originalCoeffs, refined.root);
+
+    if (ComplexUtils.abs(fzRefined) <= ComplexUtils.abs(fzInitial)) {
+      return PrecisionUtils.cleanComplex(refined.root, decimals);
+    }
+
+    return PrecisionUtils.cleanComplex(root, decimals);
+  }
+
+  /**
    * Resuelve un polinomio ingresado como expresión string (ej: "z^4 - 0.6*z^3 + 0.25*z^2 - 0.2*z + 0.05").
    */
   static solveFromString(
     polyString: string,
     tolerance: number = 1e-6,
     maxIterations: number = 100,
-    decimals: number = 6
+    decimals: number = 6,
+    seedsInput?: SeedsInput
   ): PolynomialSolverResult {
     try {
       const coeffs = this.parsePolynomialString(polyString);
-      const res = this.solveFromCoefficients(coeffs, tolerance, maxIterations, decimals);
+      const res = this.solveFromCoefficients(coeffs, tolerance, maxIterations, decimals, seedsInput);
       res.polynomialString = polyString;
       return res;
     } catch (err: any) {

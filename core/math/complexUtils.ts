@@ -1,5 +1,6 @@
 import * as math from 'mathjs';
 import { ComplexNumber } from '../domain/types';
+import { PrecisionUtils } from './precisionUtils';
 
 /**
  * Utilitarios de álgebra compleja para el algoritmo de Müller y Horner.
@@ -77,20 +78,10 @@ export class ComplexUtils {
   }
 
   /**
-   * Formatea un número complejo a string legible (ej: "2.5 + 3.1i" o "4.2").
+   * Formatea un número complejo a string con la precisión decimal exacta solicitada (ej: "2.500000 + 3.100000i").
    */
   static format(c: ComplexNumber | number, precision: number = 6): string {
     const comp = this.toComplex(c);
-    const reFixed = Number(comp.re.toFixed(precision));
-    const imFixed = Number(comp.im.toFixed(precision));
-
-    if (Math.abs(imFixed) < 1e-10) {
-      return `${reFixed}`;
-    }
-    if (Math.abs(reFixed) < 1e-10) {
-      return `${imFixed}i`;
-    }
-    const sign = imFixed > 0 ? '+' : '-';
-    return `${reFixed} ${sign} ${Math.abs(imFixed)}i`;
+    return PrecisionUtils.formatComplex(comp, precision);
   }
 }

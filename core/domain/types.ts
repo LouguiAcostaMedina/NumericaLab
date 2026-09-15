@@ -155,6 +155,16 @@ export interface MullerIteration {
   error: number | null;       // Error relativo porcentual aproximado (%)
 }
 
+export interface SeedsInput {
+  useCustomSeeds?: boolean;
+  z0?: ComplexNumber | number;
+  z1?: ComplexNumber | number;
+  z2?: ComplexNumber | number;
+  x0?: number;
+  x1?: number;
+  x2?: number;
+}
+
 /**
  * Resultado individual de una raíz encontrada por Müller (con deflación).
  */
@@ -165,6 +175,7 @@ export interface PolynomialRoot {
   iterations: MullerIteration[]; // Historial de iteraciones hasta la convergencia
   converged: boolean;
   deflatedCoefficients?: (number | ComplexNumber)[]; // Coeficientes tras deflación
+  isPurified?: boolean;        // Indica si la raíz fue purificada sobre el polinomio original
 }
 
 /**
@@ -198,3 +209,35 @@ export interface IIRFilterStabilityResult {
   lagrange: LagrangeBoundResult;
 }
 
+// ============================================================================
+// Tipos para Sistemas de Ecuaciones Lineales
+// ============================================================================
+
+export type Matrix = number[][];
+export type Vector = number[];
+
+export interface LinearSystemValidation {
+  isValid: boolean;
+  message?: string;
+}
+
+export interface DoolittleFactorization {
+  L: Matrix;
+  U: Matrix;
+}
+
+export interface DoolittleSolution {
+  Y: Vector; // Resultado intermedio de LY = B
+  X: Vector; // Resultado final de UX = Y
+  isFactorizationVerified: boolean; // LU ≈ A
+  isSolutionVerified: boolean; // AX ≈ B
+}
+
+export interface DoolittleResult {
+  success: boolean;
+  originalA: Matrix;
+  originalB: Vector;
+  factorization?: DoolittleFactorization;
+  solution?: DoolittleSolution;
+  errorMessage?: string;
+}

@@ -32,13 +32,13 @@ export default function PolynomialsPage() {
     tolerance: number,
     maxIter: number,
     decimals: number = 6,
-    seeds?: { x0: number; x1: number; x2: number }
+    seeds?: { useCustomSeeds?: boolean; x0: number; x1: number; x2: number }
   ) => {
     setIsLoading(true);
     setErrorMessage(null);
 
     try {
-      const solverRes = PolynomialSolver.solveFromString(polyStr, tolerance, maxIter, decimals);
+      const solverRes = PolynomialSolver.solveFromString(polyStr, tolerance, maxIter, decimals, seeds);
       if (!solverRes.success) {
         setErrorMessage(solverRes.errorMessage || 'No se pudo resolver el polinomio.');
         setResult(null);

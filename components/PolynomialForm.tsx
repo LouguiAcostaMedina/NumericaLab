@@ -13,7 +13,7 @@ interface PolynomialFormProps {
     tolerance: number,
     maxIter: number,
     decimals: number,
-    seeds?: { x0: number; x1: number; x2: number }
+    seeds?: { useCustomSeeds: boolean; x0: number; x1: number; x2: number }
   ) => void;
   onSolvePreset?: (presetId: string, tolerance: number, maxIter: number, decimals: number) => void;
   isLoading?: boolean;
@@ -29,6 +29,9 @@ export const PolynomialForm: React.FC<PolynomialFormProps> = ({
   const [decimals, setDecimals] = useState<number>(6);
   const [activePresetId, setActivePresetId] = useState<string>('iir-stability-main');
 
+  // Toggle "Usar semillas personalizadas" vs "Autogenerar con Lagrange"
+  const [useCustomSeeds, setUseCustomSeeds] = useState<boolean>(true);
+
   // "Las 3 cajitas" para semillas de Müller
   const [x0, setX0] = useState<string>('0');
   const [x1, setX1] = useState<string>('0.5');
@@ -39,6 +42,7 @@ export const PolynomialForm: React.FC<PolynomialFormProps> = ({
     setX0('0');
     setX1('0.5');
     setX2('1.0');
+    setUseCustomSeeds(true);
   };
 
   // Cargar un Preset de Ingeniería de 1 Clic
@@ -48,6 +52,9 @@ export const PolynomialForm: React.FC<PolynomialFormProps> = ({
     setTolerance(preset.params.tolerance);
     setMaxIterations(preset.params.maxIterations);
     setDecimals(preset.params.decimals || 6);
+
+    const hasSeeds = preset.params.x0 !== undefined && preset.params.x1 !== undefined && preset.params.x2 !== undefined;
+    setUseCustomSeeds(hasSeeds);
 
     if (preset.params.x0 !== undefined) setX0(preset.params.x0.toString());
     if (preset.params.x1 !== undefined) setX1(preset.params.x1.toString());
@@ -63,7 +70,7 @@ export const PolynomialForm: React.FC<PolynomialFormProps> = ({
       preset.params.tolerance,
       preset.params.maxIterations,
       preset.params.decimals || 6,
-      { x0: pX0, x1: pX1, x2: pX2 }
+      { useCustomSeeds: hasSeeds, x0: pX0, x1: pX1, x2: pX2 }
     );
   };
 
@@ -74,6 +81,9 @@ export const PolynomialForm: React.FC<PolynomialFormProps> = ({
     setTolerance(item.params.tolerance);
     setMaxIterations(item.params.maxIterations);
     setDecimals(item.params.decimals || 6);
+
+    const hasSeeds = item.params.x0 !== undefined;
+    setUseCustomSeeds(hasSeeds);
 
     if (item.params.x0 !== undefined) setX0(item.params.x0.toString());
     if (item.params.x1 !== undefined) setX1(item.params.x1.toString());
@@ -93,7 +103,12 @@ export const PolynomialForm: React.FC<PolynomialFormProps> = ({
       tolerance,
       maxIterations,
       decimals,
-      !isNaN(pX0) && !isNaN(pX1) && !isNaN(pX2) ? { x0: pX0, x1: pX1, x2: pX2 } : undefined
+      {
+        useCustomSeeds,
+        x0: !isNaN(pX0) ? pX0 : 0,
+        x1: !isNaN(pX1) ? pX1 : 0.5,
+        x2: !isNaN(pX2) ? pX2 : 1.0,
+      }
     );
   };
 
@@ -160,6 +175,11 @@ export const PolynomialForm: React.FC<PolynomialFormProps> = ({
 
         {/* Las 3 Cajitas (Semillas Iniciales) */}
         <ThreeBoxInput
+          useCustomSeeds={useCustomSeeds}
+          onToggleUseCustomSeeds={(val) => {
+            setUseCustomSeeds(val);
+            setActivePresetId('');
+          }}
           x0={x0}
           x1={x1}
           x2={x2}

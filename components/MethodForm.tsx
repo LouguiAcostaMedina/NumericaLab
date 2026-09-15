@@ -195,33 +195,11 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
   };
 
   const getButtonStyle = () => {
-    switch (method) {
-      case 'bisection':
-        return 'bg-cyan-600 hover:bg-cyan-500 focus:ring-cyan-500 text-white';
-      case 'false-position':
-        return 'bg-teal-600 hover:bg-teal-500 focus:ring-teal-500 text-white';
-      case 'newton':
-        return 'bg-blue-600 hover:bg-blue-500 focus:ring-blue-500 text-white';
-      case 'fixed-point':
-        return 'bg-purple-600 hover:bg-purple-500 focus:ring-purple-500 text-white';
-      case 'secant':
-        return 'bg-indigo-600 hover:bg-indigo-500 focus:ring-indigo-500 text-white';
-    }
+    return 'bg-primary hover:bg-primary/90 focus:ring-primary text-white';
   };
 
   const getFocusStyle = () => {
-    switch (method) {
-      case 'bisection':
-        return 'focus:ring-cyan-500/50';
-      case 'false-position':
-        return 'focus:ring-teal-500/50';
-      case 'newton':
-        return 'focus:ring-blue-500/50';
-      case 'fixed-point':
-        return 'focus:ring-purple-500/50';
-      case 'secant':
-        return 'focus:ring-indigo-500/50';
-    }
+    return 'focus:ring-primary/50';
   };
 
   const isFixedPoint = method === 'fixed-point';
@@ -231,10 +209,10 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm space-y-6 animate-fade-in"
+      className="bg-surface border border-border rounded-xl p-6 shadow-sm space-y-6 animate-fade-in"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-850 pb-3">
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-3">
+        <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
           <span>⚙️</span> Configuración del Método
         </h3>
 
@@ -244,18 +222,18 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
           <button
             type="button"
             onClick={resetToSmartDefaults}
-            className="text-xs text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+            className="text-xs text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
             title="Reestablecer valores de entrada por defecto recomendados"
           >
             <span>🔄</span> Defaults
           </button>
 
-          <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-lg border border-zinc-300 dark:border-zinc-700">
-            <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Precisión:</span>
+          <div className="flex items-center gap-1 bg-surface-secondary px-2 py-1 rounded-lg border border-border">
+            <span className="text-[11px] font-medium text-foreground-muted">Precisión:</span>
             <select
               value={decimals}
               onChange={(e) => setDecimals(e.target.value)}
-              className="bg-transparent text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none"
+              className="bg-transparent text-xs font-mono text-foreground focus:outline-none"
             >
               <option value="6">6</option>
               <option value="8">8</option>
@@ -269,7 +247,7 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Input: Función f(x) o g(x) */}
         <div className="md:col-span-2 space-y-1.5">
-          <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-foreground-muted uppercase tracking-wider">
             {isFixedPoint ? 'Función Despejada g(x)' : 'Función f(x)'}
           </label>
           <div className="relative">
@@ -279,13 +257,13 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
               onChange={(e) => setExpression(e.target.value)}
               placeholder={isFixedPoint ? 'ej: (x + 1)^(1/3)' : 'ej: x^3 - x - 1'}
               required
-              className="w-full px-4 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-700 transition-all font-mono"
+              className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-mono"
             />
-            <span className="absolute right-3 top-2.5 text-zinc-400 text-sm pointer-events-none">
+            <span className="absolute right-3 top-2.5 text-foreground-muted text-sm pointer-events-none">
               {isFixedPoint ? '= x' : '= 0'}
             </span>
           </div>
-          <p className="text-2xs text-zinc-400">
+          <p className="text-2xs text-foreground-muted">
             {isFixedPoint
               ? 'Despeje tal que x = g(x). Permite notación científica (ej: 1.5e-3*x).'
               : 'Soporta notación científica (ej: 1e-4*x^2 + 2x - 1.5).'}
@@ -294,7 +272,7 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
 
         {/* Notificación de Sugerencia Automática */}
         {recommendation && (
-          <div className="md:col-span-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-xs text-blue-900 dark:text-blue-200 flex items-start gap-2.5">
+          <div className="md:col-span-2 p-3 rounded-lg bg-primary/10 border border-primary/30 text-xs text-primary flex items-start gap-2.5">
             <span className="text-base">💡</span>
             <div>
               <span className="font-bold">Sugerencia Automática:</span> {recommendation.reason}
@@ -307,8 +285,8 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
           <div
             className={`md:col-span-2 p-3 rounded-lg text-xs flex items-start gap-2.5 border ${
               semanticVal.severity === 'error'
-                ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800/60 text-rose-900 dark:text-rose-200'
-                : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200'
+                ? 'bg-error/10 border-error/30 text-error'
+                : 'bg-warning/10 border-warning/30 text-warning'
             }`}
           >
             <span className="text-base">{semanticVal.severity === 'error' ? '🚫' : '⚠️'}</span>
@@ -328,7 +306,7 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
         {isBisectionOrFalsePos && (
           <>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold text-foreground-muted uppercase tracking-wider">
                 {method === 'bisection' ? 'Límite Inferior (a)' : 'Límite Inferior (xl)'}
               </label>
               <input
@@ -337,11 +315,11 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
                 value={a}
                 onChange={(e) => setA(e.target.value)}
                 required
-                className={`w-full px-4 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 ${getFocusStyle()} transition-all font-mono`}
+                className={`w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 ${getFocusStyle()} transition-all font-mono`}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold text-foreground-muted uppercase tracking-wider">
                 {method === 'bisection' ? 'Límite Superior (b)' : 'Límite Superior (xu)'}
               </label>
               <input
@@ -350,7 +328,7 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
                 value={b}
                 onChange={(e) => setB(e.target.value)}
                 required
-                className={`w-full px-4 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 ${getFocusStyle()} transition-all font-mono`}
+                className={`w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 ${getFocusStyle()} transition-all font-mono`}
               />
             </div>
           </>
@@ -359,7 +337,7 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
         {isSecant && (
           <>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold text-foreground-muted uppercase tracking-wider">
                 Semilla Inicial (x0)
               </label>
               <input
@@ -368,11 +346,11 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
                 value={x0}
                 onChange={(e) => setX0(e.target.value)}
                 required
-                className={`w-full px-4 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 ${getFocusStyle()} transition-all font-mono`}
+                className={`w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 ${getFocusStyle()} transition-all font-mono`}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+              <label className="text-xs font-semibold text-foreground-muted uppercase tracking-wider">
                 Semilla Inicial (x1)
               </label>
               <input
@@ -381,7 +359,7 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
                 value={x1}
                 onChange={(e) => setX1(e.target.value)}
                 required
-                className={`w-full px-4 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 ${getFocusStyle()} transition-all font-mono`}
+                className={`w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 ${getFocusStyle()} transition-all font-mono`}
               />
             </div>
           </>
@@ -389,7 +367,7 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
 
         {!isBisectionOrFalsePos && !isSecant && (
           <div className="md:col-span-2 space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-foreground-muted uppercase tracking-wider">
               Aproximación Inicial (x0)
             </label>
             <input
@@ -398,13 +376,13 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
               value={x0}
               onChange={(e) => setX0(e.target.value)}
               required
-              className={`w-full px-4 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 ${getFocusStyle()} transition-all font-mono`}
+              className={`w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 ${getFocusStyle()} transition-all font-mono`}
             />
           </div>
         )}
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-foreground-muted uppercase tracking-wider">
             Tolerancia del Error ε (%)
           </label>
           <input
@@ -413,12 +391,12 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
             value={tolerance}
             onChange={(e) => setTolerance(e.target.value)}
             required
-            className="w-full px-4 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-700 transition-all font-mono"
+            className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-mono"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-foreground-muted uppercase tracking-wider">
             Iteraciones Máximas
           </label>
           <input
@@ -426,7 +404,7 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
             value={maxIterations}
             onChange={(e) => setMaxIterations(e.target.value)}
             required
-            className="w-full px-4 py-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:focus:ring-zinc-700 transition-all font-mono"
+            className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-mono"
           />
         </div>
       </div>
@@ -434,7 +412,7 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
       <button
         type="submit"
         disabled={isLoading}
-        className={`w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 ${getButtonStyle()} ${
+        className={`w-full py-3 px-4 rounded-lg font-semibold text-sm transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background ${getButtonStyle()} ${
           isLoading ? 'opacity-70 cursor-not-allowed' : ''
         }`}
       >

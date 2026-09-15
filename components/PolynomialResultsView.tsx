@@ -3,6 +3,7 @@
 import React from 'react';
 import { PolynomialSolverResult, IIRFilterStabilityResult } from '../core/domain/types';
 import { ComplexUtils } from '../core/math/complexUtils';
+import { PrecisionUtils } from '../core/math/precisionUtils';
 import { EducationalNarrator } from '../core/math/educationalNarrator';
 import { ExportUtils } from '../core/utils/exportUtils';
 import { ComplexZPlaneChart } from './ComplexZPlaneChart';
@@ -226,12 +227,12 @@ export const PolynomialResultsView: React.FC<PolynomialResultsViewProps> = ({
                   <tr key={r.rootIndex} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
                     <td className="px-4 py-3 font-bold text-zinc-900 dark:text-white">z_{r.rootIndex}</td>
                     <td className="px-4 py-3 font-bold text-cyan-600 dark:text-cyan-400">
-                      {ComplexUtils.format(r.root, 6)}
+                      {PrecisionUtils.formatComplex(r.root, 6)}
                     </td>
-                    <td className="px-4 py-3 font-semibold">{r.magnitude}</td>
+                    <td className="px-4 py-3 font-semibold">{PrecisionUtils.format(r.magnitude, 6)}</td>
                     <td className="px-4 py-3">{r.iterations.length} pass(es)</td>
                     <td className="px-4 py-3 text-blue-600 dark:text-blue-400">
-                      {finalError !== null ? `${finalError.toFixed(6)}%` : '0.000000%'}
+                      {finalError !== null && finalError !== undefined ? `${finalError.toFixed(6)}%` : '0.000000%'}
                     </td>
                     <td className="px-4 py-3 font-sans">
                       <span
