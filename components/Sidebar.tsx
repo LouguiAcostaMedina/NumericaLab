@@ -109,13 +109,29 @@ export function Sidebar() {
             <p className="px-2 text-[10px] font-bold text-foreground-muted uppercase tracking-widest mb-3">
               Sistemas Lineales
             </p>
-            <div className="space-y-1" onClick={closeSidebar}>
-              <SidebarLink href="/sistemas-lineales/doolittle">
-                Factorización LU (Doolittle)
-              </SidebarLink>
-              {/* Espacio para futuros métodos */}
-              <div className="px-3 py-2 text-xs text-foreground-muted font-medium opacity-50 cursor-not-allowed">
-                Eliminación de Gauss (Pronto)
+            <div className="space-y-4" onClick={closeSidebar}>
+              <div>
+                <p className="px-3 py-1 text-[10px] font-bold text-primary/80 uppercase tracking-wider">
+                  Métodos Directos
+                </p>
+                <div className="space-y-1">
+                  <SidebarLink href="/sistemas-lineales/doolittle">
+                    Factorización LU (Doolittle)
+                  </SidebarLink>
+                </div>
+              </div>
+              <div>
+                <p className="px-3 py-1 text-[10px] font-bold text-primary/80 uppercase tracking-wider">
+                  Métodos Iterativos
+                </p>
+                <div className="space-y-1">
+                  <SidebarLink href="/sistemas-lineales/jacobi">
+                    Método de Jacobi
+                  </SidebarLink>
+                  <SidebarLink href="/sistemas-lineales/gauss-seidel">
+                    Método de Gauss-Seidel
+                  </SidebarLink>
+                </div>
               </div>
             </div>
           </div>

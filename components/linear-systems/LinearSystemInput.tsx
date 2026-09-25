@@ -1,27 +1,33 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Matrix, Vector } from '../../core/domain/types';
 
 interface LinearSystemInputProps {
   isLoading?: boolean;
-  onSubmit: (A: Matrix, B: Vector, size: number) => void;
+  onSubmit: (A: Matrix, B: Vector, size: number, x0?: Vector, tolerance?: number, maxIterations?: number) => void;
   title?: string;
   defaultSize?: number;
+  isIterative?: boolean;
 }
 
-export function LinearSystemInput({ isLoading = false, onSubmit, title = "Configuración del Sistema AX = B", defaultSize = 3 }: LinearSystemInputProps) {
+export function LinearSystemInput({ isLoading = false, onSubmit, title = "Configuración del Sistema AX = B", defaultSize = 3, isIterative = false }: LinearSystemInputProps) {
   const [size, setSize] = useState<number>(defaultSize);
-  const [matrixA, setMatrixA] = useState<string[][]>([]);
-  const [vectorB, setVectorB] = useState<string[]>([]);
+  const [matrixA, setMatrixA] = useState<string[][]>(() => 
+    Array(defaultSize).fill(0).map(() => Array(defaultSize).fill(''))
+  );
+  const [vectorB, setVectorB] = useState<string[]>(() => Array(defaultSize).fill(''));
+  const [vectorX0, setVectorX0] = useState<string[]>(() => Array(defaultSize).fill('0'));
+  const [tolerance, setTolerance] = useState<string>('1e-4');
+  const [maxIterations, setMaxIterations] = useState<string>('100');
 
-  // Inicializa la matriz con el tamaño seleccionado (vacía por defecto)
-  useEffect(() => {
-    // Intentar conservar valores si cambiamos el tamaño
+  const handleSizeChange = (newSize: number) => {
+    setSize(newSize);
+
     setMatrixA((prevA) => {
-      const newA = Array(size).fill(0).map(() => Array(size).fill(''));
-      for (let i = 0; i < Math.min(prevA.length, size); i++) {
-        for (let j = 0; j < Math.min(prevA[i].length, size); j++) {
+      const newA = Array(newSize).fill(0).map(() => Array(newSize).fill(''));
+      for (let i = 0; i < Math.min(prevA.length, newSize); i++) {
+        for (let j = 0; j < Math.min(prevA[i].length, newSize); j++) {
           newA[i][j] = prevA[i][j];
         }
       }
@@ -29,13 +35,21 @@ export function LinearSystemInput({ isLoading = false, onSubmit, title = "Config
     });
 
     setVectorB((prevB) => {
-      const newB = Array(size).fill('');
-      for (let i = 0; i < Math.min(prevB.length, size); i++) {
+      const newB = Array(newSize).fill('');
+      for (let i = 0; i < Math.min(prevB.length, newSize); i++) {
         newB[i] = prevB[i];
       }
       return newB;
     });
-  }, [size]);
+
+    setVectorX0((prevX0) => {
+      const newX0 = Array(newSize).fill('0');
+      for (let i = 0; i < Math.min(prevX0.length, newSize); i++) {
+        newX0[i] = prevX0[i] !== '' ? prevX0[i] : '0';
+      }
+      return newX0;
+    });
+  };
 
   const handleMatrixChange = (row: number, col: number, value: string) => {
     setMatrixA(prev => {
@@ -54,6 +68,14 @@ export function LinearSystemInput({ isLoading = false, onSubmit, title = "Config
     });
   };
 
+  const handleVectorX0Change = (row: number, value: string) => {
+    setVectorX0(prev => {
+      const newX0 = [...prev];
+      newX0[row] = value;
+      return newX0;
+    });
+  };
+
   const loadExample = () => {
     setSize(3);
     setMatrixA([
@@ -62,6 +84,9 @@ export function LinearSystemInput({ isLoading = false, onSubmit, title = "Config
       ['-8', '8', '7']
     ]);
     setVectorB(['14', '46', '26']);
+    setVectorX0(['0', '0', '0']);
+    setTolerance('1e-4');
+    setMaxIterations('100');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -91,7 +116,33 @@ export function LinearSystemInput({ isLoading = false, onSubmit, title = "Config
       parsedB.push(valB);
     }
 
-    onSubmit(parsedA, parsedB, size);
+    if (isIterative) {
+      const parsedX0: Vector = [];
+      for (let i = 0; i < size; i++) {
+        const valX0 = parseFloat(vectorX0[i]);
+        if (isNaN(valX0)) {
+          alert(`Por favor, ingresa un valor numérico en X0[${i+1}]`);
+          return;
+        }
+        parsedX0.push(valX0);
+      }
+
+      const parsedTolerance = parseFloat(tolerance);
+      if (isNaN(parsedTolerance) || parsedTolerance <= 0) {
+        alert('La tolerancia debe ser un número positivo mayor que cero.');
+        return;
+      }
+
+      const parsedMaxIter = parseInt(maxIterations, 10);
+      if (isNaN(parsedMaxIter) || parsedMaxIter <= 0) {
+        alert('El máximo de iteraciones debe ser un entero positivo.');
+        return;
+      }
+
+      onSubmit(parsedA, parsedB, size, parsedX0, parsedTolerance, parsedMaxIter);
+    } else {
+      onSubmit(parsedA, parsedB, size);
+    }
   };
 
   return (
@@ -117,7 +168,7 @@ export function LinearSystemInput({ isLoading = false, onSubmit, title = "Config
             </label>
             <select
               value={size}
-              onChange={(e) => setSize(parseInt(e.target.value, 10))}
+              onChange={(e) => handleSizeChange(parseInt(e.target.value, 10))}
               className="bg-transparent text-sm font-bold text-foreground focus:outline-none cursor-pointer"
             >
               {[2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
@@ -183,8 +234,71 @@ export function LinearSystemInput({ isLoading = false, onSubmit, title = "Config
               ))}
             </div>
           </div>
+
+          {/* Configuración Iterativa */}
+          {isIterative && (
+            <>
+              <div className="flex flex-col justify-center h-full pt-12 px-2">
+                <div className="h-full border-l border-border/50"></div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="text-center text-xs font-semibold text-foreground-muted uppercase tracking-widest mb-4">
+                  Vector Inicial x⁽⁰⁾
+                </div>
+                
+                <div className="relative p-4 border-l-2 border-r-2 border-foreground-muted rounded-sm bg-surface-secondary/50">
+                  {vectorX0.length === size && vectorX0.map((val, i) => (
+                    <div key={`x0-${i}`} className="flex mb-2 last:mb-0">
+                      <input
+                        type="number"
+                        step="any"
+                        value={val}
+                        onChange={(e) => handleVectorX0Change(i, e.target.value)}
+                        placeholder={`x0_${i+1}`}
+                        required
+                        className="w-16 h-10 text-center rounded bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-mono text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
+
+      {isIterative && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-border">
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold text-foreground">Tolerancia (ε)</label>
+            <input
+              type="number"
+              step="any"
+              value={tolerance}
+              onChange={(e) => setTolerance(e.target.value)}
+              placeholder="Ej: 1e-4"
+              required
+              className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            />
+            <p className="text-xs text-foreground-muted">Error relativo máximo aceptado.</p>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold text-foreground">Iteraciones máximas</label>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value={maxIterations}
+              onChange={(e) => setMaxIterations(e.target.value)}
+              placeholder="Ej: 100"
+              required
+              className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+            />
+            <p className="text-xs text-foreground-muted">Límite para evitar bucles infinitos.</p>
+          </div>
+        </div>
+      )}
 
       <button
         type="submit"
