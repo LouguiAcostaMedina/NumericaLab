@@ -241,3 +241,66 @@ export interface DoolittleResult {
   solution?: DoolittleSolution;
   errorMessage?: string;
 }
+
+// ============================================================================
+// Tipos para Sistemas Lineales Iterativos (Jacobi, Gauss-Seidel)
+// ============================================================================
+
+export interface IterativeMethodConfig {
+  initialVector: Vector;
+  tolerance: number;
+  maxIterations: number;
+}
+
+export interface IterationRecord {
+  iteration: number;
+  x: Vector;
+  relativeErrors: number[];
+  maxRelativeError: number;
+  residualNorm?: number;
+}
+
+export type IterativeStatus =
+  | "converged"
+  | "max_iterations"
+  | "numerical_error"
+  | "zero_diagonal"
+  | "stagnated";
+
+export interface EDDRowAnalysis {
+  row: number;
+  diagonalValue: number;
+  offDiagonalSum: number;
+  satisfies: boolean;
+}
+
+export interface ConvergenceAnalysis {
+  strictlyDiagonallyDominant: boolean;
+  rows: EDDRowAnalysis[];
+  convergenceGuaranteedByEDD: boolean;
+  message: string;
+}
+
+export interface SassenfeldAnalysis {
+  betas: number[];
+  betaMax: number;
+  guaranteesConvergence: boolean;
+  message: string;
+}
+
+export interface IterativeResult {
+  success: boolean;
+  method: 'jacobi' | 'gauss-seidel';
+  originalA: Matrix;
+  originalB: Vector;
+  config: IterativeMethodConfig;
+  convergenceAnalysis: ConvergenceAnalysis;
+  sassenfeldAnalysis?: SassenfeldAnalysis;
+  iterations: IterationRecord[];
+  iterationCount: number;
+  finalError: number;
+  finalResidual: number;
+  solution: Vector;
+  status: IterativeStatus;
+  errorMessage?: string;
+}
