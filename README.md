@@ -10,6 +10,9 @@ Una plataforma web interactiva de última generación para la resolución de ecu
   * **Método de Newton-Raphson**: Algoritmo abierto que utiliza la derivada simbólica para una convergencia rápida.
   * **Método de Punto Fijo**: Algoritmo abierto que resuelve la ecuación a partir de su forma despejada $x = g(x)$.
   * **Método de la Secante**: Algoritmo abierto que aproxima la derivada usando dos semillas iniciales.
+* **Sistemas de Ecuaciones Lineales (Métodos Iterativos)**:
+  * **Método de Jacobi**: Método iterativo clásico para la resolución de sistemas $n \times n$. Incluye verificación de dominancia diagonal.
+  * **Método de Gauss-Seidel**: Versión acelerada de Jacobi, con actualización inmediata de las variables y verificación mediante el Criterio de Sassenfeld.
 * **Evaluación Simbólica y Derivación**: Parser matemático avanzado para evaluar expresiones de forma segura y calcular derivadas de forma analítica en el cliente.
 * **Gráficas de Convergencia**: Visualización interactiva del decaimiento del error relativo porcentual ($\varepsilon_a$ vs Iteración) por medio de gráficos de líneas dinámicos.
 * **Exportación Multi-formato**: Descarga de los resultados de las iteraciones en formatos **CSV** (optimizado para Excel), **Excel (.xlsx)** y reporte en **PDF** con formato profesional.
