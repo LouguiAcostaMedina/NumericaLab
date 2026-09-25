@@ -13,19 +13,21 @@ interface LinearSystemInputProps {
 
 export function LinearSystemInput({ isLoading = false, onSubmit, title = "Configuración del Sistema AX = B", defaultSize = 3, isIterative = false }: LinearSystemInputProps) {
   const [size, setSize] = useState<number>(defaultSize);
-  const [matrixA, setMatrixA] = useState<string[][]>([]);
-  const [vectorB, setVectorB] = useState<string[]>([]);
-  const [vectorX0, setVectorX0] = useState<string[]>([]);
+  const [matrixA, setMatrixA] = useState<string[][]>(() => 
+    Array(defaultSize).fill(0).map(() => Array(defaultSize).fill(''))
+  );
+  const [vectorB, setVectorB] = useState<string[]>(() => Array(defaultSize).fill(''));
+  const [vectorX0, setVectorX0] = useState<string[]>(() => Array(defaultSize).fill('0'));
   const [tolerance, setTolerance] = useState<string>('1e-4');
   const [maxIterations, setMaxIterations] = useState<string>('100');
 
-  // Inicializa la matriz con el tamaño seleccionado (vacía por defecto)
-  useEffect(() => {
-    // Intentar conservar valores si cambiamos el tamaño
+  const handleSizeChange = (newSize: number) => {
+    setSize(newSize);
+
     setMatrixA((prevA) => {
-      const newA = Array(size).fill(0).map(() => Array(size).fill(''));
-      for (let i = 0; i < Math.min(prevA.length, size); i++) {
-        for (let j = 0; j < Math.min(prevA[i].length, size); j++) {
+      const newA = Array(newSize).fill(0).map(() => Array(newSize).fill(''));
+      for (let i = 0; i < Math.min(prevA.length, newSize); i++) {
+        for (let j = 0; j < Math.min(prevA[i].length, newSize); j++) {
           newA[i][j] = prevA[i][j];
         }
       }
@@ -33,21 +35,21 @@ export function LinearSystemInput({ isLoading = false, onSubmit, title = "Config
     });
 
     setVectorB((prevB) => {
-      const newB = Array(size).fill('');
-      for (let i = 0; i < Math.min(prevB.length, size); i++) {
+      const newB = Array(newSize).fill('');
+      for (let i = 0; i < Math.min(prevB.length, newSize); i++) {
         newB[i] = prevB[i];
       }
       return newB;
     });
 
     setVectorX0((prevX0) => {
-      const newX0 = Array(size).fill('0');
-      for (let i = 0; i < Math.min(prevX0.length, size); i++) {
+      const newX0 = Array(newSize).fill('0');
+      for (let i = 0; i < Math.min(prevX0.length, newSize); i++) {
         newX0[i] = prevX0[i] !== '' ? prevX0[i] : '0';
       }
       return newX0;
     });
-  }, [size]);
+  };
 
   const handleMatrixChange = (row: number, col: number, value: string) => {
     setMatrixA(prev => {
@@ -166,7 +168,7 @@ export function LinearSystemInput({ isLoading = false, onSubmit, title = "Config
             </label>
             <select
               value={size}
-              onChange={(e) => setSize(parseInt(e.target.value, 10))}
+              onChange={(e) => handleSizeChange(parseInt(e.target.value, 10))}
               className="bg-transparent text-sm font-bold text-foreground focus:outline-none cursor-pointer"
             >
               {[2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
