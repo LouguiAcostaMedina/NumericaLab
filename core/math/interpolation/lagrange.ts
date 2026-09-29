@@ -1,4 +1,4 @@
-import { InterpolationPoint, LagrangeBasis, LagrangeResult } from '../../domain/types';
+import { InterpolationPoint, LagrangeBasis, LagrangeResult, ProcedureStep } from '../../domain/types';
 import * as math from 'mathjs';
 
 function multiplyPolynomials(p1: number[], p2: number[]): number[] {
@@ -212,6 +212,41 @@ export function calculateLagrange(points: InterpolationPoint[], xEval?: number):
     curvePoints.push({ x, y });
   }
 
+  const manualProcedure: ProcedureStep[] = [];
+  manualProcedure.push({
+    id: 'lagrange-1',
+    type: 'FORMULA_DERIVATION',
+    title: 'Paso 1: Polinomios Base de Lagrange (L_k)',
+    description: 'Calculamos las funciones base de Lagrange L_k(x) para cada punto de la tabla, formando el producto de (x - x_i)/(x_k - x_i) para todo i ≠ k.',
+    mathExpression: basisPolynomials.map(b => `L_${b.index}(x) = ${b.basisExpression}`).join('\n')
+  });
+
+  manualProcedure.push({
+    id: 'lagrange-2',
+    type: 'FORMULA_DERIVATION',
+    title: 'Paso 2: Construcción del Polinomio P(x)',
+    description: 'Multiplicamos cada y_k por su base correspondiente L_k(x) y sumamos los términos para conformar el polinomio interpolador completo.',
+    mathExpression: `P_{${n-1}}(x) = ${polynomialExpression}`
+  });
+
+  manualProcedure.push({
+    id: 'lagrange-3',
+    type: 'FINAL_RESULT',
+    title: 'Paso 3: Polinomio Simplificado',
+    description: 'Se desarrolla el producto, se dividen las constantes y se suman los términos semejantes para presentar la forma canónica del polinomio.',
+    mathExpression: `P_{${n-1}}(x) = ${simplifiedPolynomial}`
+  });
+
+  if (interpolatedValue !== undefined && xEval !== undefined) {
+    manualProcedure.push({
+      id: 'lagrange-4',
+      type: 'ITERATION_SUBSTITUTION',
+      title: 'Paso 4: Evaluación Numérica',
+      description: `Sustituimos el punto x = ${xEval} en el polinomio simplificado para obtener el valor interpolado.`,
+      mathExpression: `P_{${n-1}}(${xEval}) = ${interpolatedValue}`
+    });
+  }
+
   return {
     success: true,
     points,
@@ -222,6 +257,7 @@ export function calculateLagrange(points: InterpolationPoint[], xEval?: number):
     polynomialCoefficients,
     interpolatedValue,
     curvePoints,
-    verification
+    verification,
+    manualProcedure
   };
 }

@@ -7,6 +7,7 @@ import { ConvergenceChart } from '../../components/ConvergenceChart';
 import { SkeletonLoader } from '../../components/SkeletonLoader';
 import { calculateFalsePosition } from '../../core/math/falsePosition';
 import { FalsePositionIteration, MethodResponse } from '../../core/domain/types';
+import { ManualSolutionView } from '../../components/procedures/ManualSolutionView';
 
 export default function FalsePositionPage() {
   const [result, setResult] = useState<MethodResponse<FalsePositionIteration> | null>(null);
@@ -112,6 +113,11 @@ export default function FalsePositionPage() {
                     </p>
                   </div>
                 </div>
+              )}
+
+              {/* Solución Manual Paso a Paso */}
+              {result && result.manualProcedure && (
+                <ManualSolutionView steps={result.manualProcedure} />
               )}
 
               {/* Results Table */}

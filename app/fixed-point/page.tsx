@@ -7,6 +7,7 @@ import { ConvergenceChart } from '../../components/ConvergenceChart';
 import { SkeletonLoader } from '../../components/SkeletonLoader';
 import { calculateFixedPoint } from '../../core/math/fixedPoint';
 import { FixedPointIteration, MethodResponse } from '../../core/domain/types';
+import { ManualSolutionView } from '../../components/procedures/ManualSolutionView';
 
 export default function FixedPointPage() {
   const [result, setResult] = useState<MethodResponse<FixedPointIteration> | null>(null);
@@ -114,6 +115,11 @@ export default function FixedPointPage() {
                     </p>
                   </div>
                 </div>
+              )}
+
+              {/* Solución Manual Paso a Paso */}
+              {result && result.manualProcedure && (
+                <ManualSolutionView steps={result.manualProcedure} />
               )}
 
               {/* Results Table */}

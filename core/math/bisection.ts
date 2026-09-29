@@ -1,4 +1,4 @@
-import { BisectionIteration, MethodResponse } from '../domain/types';
+import { BisectionIteration, MethodResponse, ProcedureStep } from '../domain/types';
 import { MathParser } from './MathParser';
 import { MethodRecommender } from './methodRecommender';
 import { PrecisionUtils } from './precisionUtils';
@@ -166,6 +166,25 @@ export function calculateBisection(
       xrOld = xr;
     }
 
+    const manualProcedure: ProcedureStep[] = [];
+    if (iterations.length > 0) {
+      const i1 = iterations[0];
+      manualProcedure.push({
+        id: 'bisec-1',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Cálculo del Punto Medio',
+        description: `Calculamos el punto medio del intervalo inicial [a, b].`,
+        mathExpression: `x_r = (${i1.a} + ${i1.b}) / 2 = ${i1.xr}`
+      });
+      manualProcedure.push({
+        id: 'bisec-2',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Evaluación y Decisión',
+        description: `Evaluamos la función en a y xr. Si f(a)*f(xr) < 0, la raíz está en [a, xr]. En caso contrario, está en [xr, b].`,
+        mathExpression: `f(a) = ${i1.fa} \\\\ f(x_r) = ${i1.fxr}`
+      });
+    }
+
     return {
       success: true,
       root: PrecisionUtils.round(xr, decimals),
@@ -173,6 +192,7 @@ export function calculateBisection(
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,
+      manualProcedure
     };
   } catch (error: unknown) {
     return {

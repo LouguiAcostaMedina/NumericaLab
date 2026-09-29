@@ -1,4 +1,4 @@
-import { FalsePositionIteration, MethodResponse } from '../domain/types';
+import { FalsePositionIteration, MethodResponse, ProcedureStep } from '../domain/types';
 import { MathParser } from './MathParser';
 import { MethodRecommender } from './methodRecommender';
 import { PrecisionUtils } from './precisionUtils';
@@ -179,6 +179,18 @@ export function calculateFalsePosition(
       xrOld = xr;
     }
 
+    const manualProcedure: ProcedureStep[] = [];
+    if (iterations.length > 0) {
+      const i1 = iterations[0];
+      manualProcedure.push({
+        id: 'fp-1',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Fórmula de Falsa Posición',
+        description: `Trazamos una línea secante entre (x_l, f(x_l)) y (x_u, f(x_u)) y encontramos su intersección con el eje X.`,
+        mathExpression: `x_r = x_u - \\frac{f(x_u)(x_l - x_u)}{f(x_l) - f(x_u)} = ${i1.xr}`
+      });
+    }
+
     return {
       success: true,
       root: PrecisionUtils.round(xr, decimals),
@@ -186,6 +198,7 @@ export function calculateFalsePosition(
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,
+      manualProcedure
     };
   } catch (error: unknown) {
     return {

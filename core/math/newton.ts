@@ -1,4 +1,4 @@
-import { NewtonIteration, MethodResponse } from '../domain/types';
+import { NewtonIteration, MethodResponse, ProcedureStep } from '../domain/types';
 import { MathParser } from './MathParser';
 import { MethodRecommender } from './methodRecommender';
 import { PrecisionUtils } from './precisionUtils';
@@ -113,6 +113,25 @@ export function calculateNewtonRaphson(
       xi = xiNext;
     }
 
+    const manualProcedure: ProcedureStep[] = [];
+    if (iterations.length > 0) {
+      const i1 = iterations[0];
+      manualProcedure.push({
+        id: 'newton-1',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Evaluación en x_0',
+        description: `Evaluamos la función y su derivada analítica en la semilla inicial x_0.`,
+        mathExpression: `f(${i1.xi}) = ${i1.fxi} \\n f'(${i1.xi}) = ${i1.dfxi}`
+      });
+      manualProcedure.push({
+        id: 'newton-2',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Cálculo del Siguiente Punto',
+        description: `Aplicamos la fórmula iterativa de Newton-Raphson para obtener x_1.`,
+        mathExpression: `x_1 = ${i1.xi} - (${i1.fxi} / ${i1.dfxi}) = ${i1.xiNext}`
+      });
+    }
+
     return {
       success: true,
       root: PrecisionUtils.round(xiNext, decimals),
@@ -120,6 +139,7 @@ export function calculateNewtonRaphson(
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,
+      manualProcedure
     };
   } catch (error: unknown) {
     return {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { LagrangeResult } from '../../core/domain/types';
+import { ManualSolutionView } from '../procedures/ManualSolutionView';
 
 interface LagrangeResultsProps {
   result: LagrangeResult;
@@ -97,6 +98,7 @@ export function LagrangeResults({ result }: LagrangeResultsProps) {
         </div>
       </section>
 
+      <ManualSolutionView steps={result.manualProcedure} />
     </div>
   );
 }

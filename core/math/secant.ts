@@ -1,4 +1,4 @@
-import { SecantIteration, MethodResponse } from '../domain/types';
+import { SecantIteration, MethodResponse, ProcedureStep } from '../domain/types';
 import { MathParser } from './MathParser';
 import { MethodRecommender } from './methodRecommender';
 import { PrecisionUtils } from './precisionUtils';
@@ -120,6 +120,18 @@ export function calculateSecant(
       xi = xiNext;
     }
 
+    const manualProcedure: ProcedureStep[] = [];
+    if (iterations.length > 0) {
+      const i1 = iterations[0];
+      manualProcedure.push({
+        id: 'secant-1',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Fórmula de la Secante',
+        description: `Trazamos una línea secante entre (x_{i-1}, f(x_{i-1})) y (x_i, f(x_i)) y calculamos su intersección con el eje X.`,
+        mathExpression: `x_{i+1} = ${i1.xi} - \\frac{${i1.fxi}(${i1.xi} - ${i1.xiMinus1})}{${i1.fxi} - ${i1.fxiMinus1}} = ${i1.xiNext}`
+      });
+    }
+
     return {
       success: true,
       root: PrecisionUtils.round(xiNext, decimals),
@@ -127,6 +139,7 @@ export function calculateSecant(
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,
+      manualProcedure
     };
   } catch (error: unknown) {
     return {

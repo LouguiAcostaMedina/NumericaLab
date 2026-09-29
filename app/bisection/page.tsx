@@ -11,6 +11,7 @@ import { calculateBisection } from '../../core/math/bisection';
 import { EducationalNarrator } from '../../core/math/educationalNarrator';
 import { HistoryStorage } from '../../core/utils/historyStorage';
 import { BisectionIteration, MethodResponse } from '../../core/domain/types';
+import { ManualSolutionView } from '../../components/procedures/ManualSolutionView';
 
 export default function BisectionPage() {
   const [result, setResult] = useState<MethodResponse<BisectionIteration> | null>(null);
@@ -138,6 +139,11 @@ export default function BisectionPage() {
                 <EducationalModePanel
                   narrative={EducationalNarrator.narrateRealMethod('bisection', result, currentExpression)}
                 />
+              )}
+
+              {/* Solución Manual Paso a Paso */}
+              {result && result.manualProcedure && (
+                <ManualSolutionView steps={result.manualProcedure} />
               )}
 
               {/* Tabla de Iteraciones */}

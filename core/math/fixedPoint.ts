@@ -1,4 +1,4 @@
-import { FixedPointIteration, MethodResponse } from '../domain/types';
+import { FixedPointIteration, MethodResponse, ProcedureStep } from '../domain/types';
 import { MathParser } from './MathParser';
 import { MethodRecommender } from './methodRecommender';
 import { PrecisionUtils } from './precisionUtils';
@@ -95,6 +95,18 @@ export function calculateFixedPoint(
       xi = gxi;
     }
 
+    const manualProcedure: ProcedureStep[] = [];
+    if (iterations.length > 0) {
+      const i1 = iterations[0];
+      manualProcedure.push({
+        id: 'fixpt-1',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Evaluación en g(x)',
+        description: `Evaluamos el valor inicial en la función despejada g(x) para obtener la nueva estimación de x.`,
+        mathExpression: `x_1 = g(${i1.xi}) = ${i1.gxi}`
+      });
+    }
+
     return {
       success: true,
       root: PrecisionUtils.round(gxi, decimals),
@@ -102,6 +114,7 @@ export function calculateFixedPoint(
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,
+      manualProcedure
     };
   } catch (error: unknown) {
     return {
