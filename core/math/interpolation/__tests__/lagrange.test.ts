@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import * as assert from 'node:assert';
-import { calculateLagrange } from '../lagrange.ts';
+import { calculateLagrange } from '../lagrange';
 
 describe('Interpolación de Lagrange', () => {
   it('Debe interpolar el caso de la actividad autónoma (Sesión 8) correctamente', () => {
