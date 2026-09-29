@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { ProcedureStep } from '../../core/domain/types';
+import { BlockMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
 
 interface ProcedureStepRendererProps {
   step: ProcedureStep;
@@ -10,12 +12,9 @@ interface ProcedureStepRendererProps {
 export function ProcedureStepRenderer({ step }: ProcedureStepRendererProps) {
   
   const renderFormula = (expr: string) => {
-    // For now, simple mono text rendering. Can be upgraded to KaTeX later.
     return (
-      <div className="bg-surface-secondary border border-border rounded-lg p-4 overflow-x-auto my-2">
-        <code className="text-sm font-mono text-primary whitespace-nowrap">
-          {expr}
-        </code>
+      <div className="bg-surface-secondary border border-border rounded-lg p-4 overflow-x-auto my-2 shadow-inner">
+        <BlockMath math={expr} />
       </div>
     );
   };
