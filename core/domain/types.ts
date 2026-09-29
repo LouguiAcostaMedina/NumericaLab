@@ -58,6 +58,17 @@ export interface MethodRecommendation {
 /**
  * Estructura de respuesta estándar para cualquier método numérico.
  */
+export type StepType = 'SYSTEM_SETUP' | 'FORMULA_DERIVATION' | 'MATRIX_CALCULATION' | 'ITERATION_SUBSTITUTION' | 'FINAL_RESULT';
+
+export interface ProcedureStep {
+  id: string;
+  type: StepType;
+  title: string;
+  mathExpression?: string;
+  matrixData?: Matrix;
+  description: string;
+}
+
 export interface MethodResponse<T> {
   success: boolean;
   root?: number;
@@ -66,6 +77,7 @@ export interface MethodResponse<T> {
   precisionConfig?: PrecisionConfig;
   semanticValidation?: SemanticValidationResult;
   recommendation?: MethodRecommendation;
+  manualProcedure?: ProcedureStep[];
 }
 
 /**
@@ -240,6 +252,7 @@ export interface DoolittleResult {
   factorization?: DoolittleFactorization;
   solution?: DoolittleSolution;
   errorMessage?: string;
+  manualProcedure?: ProcedureStep[];
 }
 
 // ============================================================================
@@ -303,6 +316,7 @@ export interface IterativeResult {
   solution: Vector;
   status: IterativeStatus;
   errorMessage?: string;
+  manualProcedure?: ProcedureStep[];
 }
 
 // ============================================================================
@@ -338,5 +352,6 @@ export interface LagrangeResult {
     isCorrect: boolean;
   }[];
   errorMessage?: string;
+  manualProcedure?: ProcedureStep[];
 }
 
