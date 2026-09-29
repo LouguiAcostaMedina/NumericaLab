@@ -304,3 +304,39 @@ export interface IterativeResult {
   status: IterativeStatus;
   errorMessage?: string;
 }
+
+// ============================================================================
+// Tipos para Interpolación
+// ============================================================================
+
+export interface InterpolationPoint {
+  x: number;
+  y: number;
+}
+
+export interface LagrangeBasis {
+  index: number;
+  numeratorFactors: number[]; // the (x - xi) values
+  denominator: number;        // the (xk - xi) product
+  expandedNumerator?: string;
+  basisExpression: string;    // Forma producto de Lk(x)
+}
+
+export interface LagrangeResult {
+  success: boolean;
+  points: InterpolationPoint[];
+  evaluationPoint?: number;
+  basisPolynomials: LagrangeBasis[];
+  polynomialExpression: string; // y0*L0(x) + y1*L1(x) + ...
+  simplifiedPolynomial: string; // a3 x^3 + a2 x^2 + a1 x + a0
+  polynomialCoefficients: number[]; // [a0, a1, a2, a3] -> a0 + a1*x + a2*x^2 + a3*x^3
+  interpolatedValue?: number;
+  curvePoints: InterpolationPoint[];
+  verification: {
+    point: InterpolationPoint;
+    calculated: number;
+    isCorrect: boolean;
+  }[];
+  errorMessage?: string;
+}
+
