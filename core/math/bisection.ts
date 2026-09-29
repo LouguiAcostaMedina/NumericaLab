@@ -174,10 +174,10 @@ export function calculateBisection(
       semanticValidation,
       recommendation,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      errorMessage: error.message || 'Error inesperado durante el cálculo por Bisección.',
+      errorMessage: (error instanceof Error ? error.message : String(error)) || 'Error inesperado durante el cálculo por Bisección.',
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,

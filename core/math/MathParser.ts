@@ -56,11 +56,11 @@ export class MathParser {
           parsed.compile();
 
           resolve({ isValid: true, normalized });
-        } catch (err: any) {
+        } catch (err: unknown) {
           resolve({
             isValid: false,
             normalized: expression,
-            error: err.message || 'Error de sintaxis en la expresión matemática.',
+            error: (err instanceof Error ? err.message : String(err)) || 'Error de sintaxis en la expresión matemática.',
           });
         }
       }, 0);
@@ -92,8 +92,8 @@ export class MathParser {
       }
 
       return result;
-    } catch (error: any) {
-      throw new Error(`Error al evaluar la expresión "${expression}": ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(`Error al evaluar la expresión "${expression}": ${(error instanceof Error ? error.message : String(error))}`);
     }
   }
 
@@ -105,8 +105,8 @@ export class MathParser {
       const normalized = this.normalizeExpression(expression);
       const derived = math.derivative(normalized, variable);
       return derived.toString();
-    } catch (error: any) {
-      throw new Error(`Error al calcular la derivada simbólica de "${expression}": ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(`Error al calcular la derivada simbólica de "${expression}": ${(error instanceof Error ? error.message : String(error))}`);
     }
   }
 
@@ -138,11 +138,11 @@ export class MathParser {
     try {
       // 1. Validar sintaxis general de la expresión
       math.parse(expr).compile();
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         isValid: false,
         severity: 'error',
-        message: `Sintaxis no válida: ${err.message}`,
+        message: `Sintaxis no válida: ${(err instanceof Error ? err.message : String(err))}`,
       };
     }
 
@@ -163,11 +163,11 @@ export class MathParser {
               details: { dfx0, x0 },
             };
           }
-        } catch (err: any) {
+        } catch (err: unknown) {
           return {
             isValid: true,
             severity: 'warning',
-            message: `No se pudo precambiar f'(${x0}): ${err.message}. El método intentará evaluar derivación numérica.`,
+            message: `No se pudo precambiar f'(${x0}): ${(err instanceof Error ? err.message : String(err))}. El método intentará evaluar derivación numérica.`,
           };
         }
         break;
@@ -200,11 +200,11 @@ export class MathParser {
                 details: { fa, fb, product: fa * fb },
               };
             }
-          } catch (err: any) {
+          } catch (err: unknown) {
             return {
               isValid: false,
               severity: 'error',
-              message: `Error al pre-evaluar f(a) o f(b): ${err.message}`,
+              message: `Error al pre-evaluar f(a) o f(b): ${(err instanceof Error ? err.message : String(err))}`,
             };
           }
         }
@@ -227,11 +227,11 @@ export class MathParser {
               details: { fx0, fx1 },
             };
           }
-        } catch (err: any) {
+        } catch (err: unknown) {
           return {
             isValid: false,
             severity: 'error',
-            message: `Error evaluando f(x0) o f(x1) para Secante: ${err.message}`,
+            message: `Error evaluando f(x0) o f(x1) para Secante: ${(err instanceof Error ? err.message : String(err))}`,
           };
         }
         break;

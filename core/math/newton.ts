@@ -57,10 +57,10 @@ export function calculateNewtonRaphson(
     let derivativeExpression: string;
     try {
       derivativeExpression = MathParser.derivative(expression, 'x');
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         success: false,
-        errorMessage: `No se pudo calcular la derivada simbólica de la función. Detalle: ${err.message}`,
+        errorMessage: `No se pudo calcular la derivada simbólica de la función. Detalle: ${(err instanceof Error ? err.message : String(err))}`,
         precisionConfig: { decimals },
         semanticValidation,
         recommendation,
@@ -121,10 +121,10 @@ export function calculateNewtonRaphson(
       semanticValidation,
       recommendation,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      errorMessage: error.message || 'Error inesperado durante el cálculo por Newton-Raphson.',
+      errorMessage: (error instanceof Error ? error.message : String(error)) || 'Error inesperado durante el cálculo por Newton-Raphson.',
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,

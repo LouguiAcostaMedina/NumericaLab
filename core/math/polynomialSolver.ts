@@ -37,7 +37,7 @@ export class PolynomialSolver {
     }
 
     // Normalizar descartando ceros iniciales si a_n == 0
-    let cleanCoeffs = [...coeffs];
+    const cleanCoeffs = [...coeffs];
     while (cleanCoeffs.length > 1 && Math.abs(cleanCoeffs[0]) < 1e-12) {
       cleanCoeffs.shift();
     }
@@ -227,7 +227,7 @@ export class PolynomialSolver {
       const res = this.solveFromCoefficients(coeffs, tolerance, maxIterations, decimals, seedsInput);
       res.polynomialString = polyString;
       return res;
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         success: false,
         polynomialString: polyString,
@@ -236,7 +236,7 @@ export class PolynomialSolver {
         descartes: DescartesLagrange.analyzeDescartes([]),
         lagrange: DescartesLagrange.calculateBounds([]),
         roots: [],
-        errorMessage: err.message || 'Error al parsear el polinomio.',
+        errorMessage: (err instanceof Error ? err.message : String(err)) || 'Error al parsear el polinomio.',
       };
     }
   }
@@ -252,7 +252,7 @@ export class PolynomialSolver {
 
     try {
       // Normalizar la expresión para mathjs (remplazar 'z' por 'x' temporalmente para derivación de mathjs si fuera necesario)
-      let expr = polyStr.trim().replace(/-\s+/g, '- ').replace(/\+\s+/g, '+ ');
+      const expr = polyStr.trim().replace(/-\s+/g, '- ').replace(/\+\s+/g, '+ ');
       const varName = expr.includes('z') ? 'z' : 'x';
 
       const parsed = math.parse(expr);
@@ -295,8 +295,8 @@ export class PolynomialSolver {
       }
 
       return coeffs;
-    } catch (err: any) {
-      throw new Error(`Sintaxis polinómica no válida: ${err.message}. Ejemplo válido: "z^4 - 0.6*z^3 + 0.25*z^2 - 0.2*z + 0.05"`);
+    } catch (err: unknown) {
+      throw new Error(`Sintaxis polinómica no válida: ${(err instanceof Error ? err.message : String(err))}. Ejemplo válido: "z^4 - 0.6*z^3 + 0.25*z^2 - 0.2*z + 0.05"`);
     }
   }
 

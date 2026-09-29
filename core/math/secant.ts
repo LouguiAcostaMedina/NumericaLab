@@ -69,10 +69,10 @@ export function calculateSecant(
       try {
         fxiMinus1 = MathParser.evaluate(expression, { x: xiMinus1 });
         fxi = MathParser.evaluate(expression, { x: xi });
-      } catch (err: any) {
+      } catch (err: unknown) {
         return {
           success: false,
-          errorMessage: `Error al evaluar la función. Detalle: ${err.message}`,
+          errorMessage: `Error al evaluar la función. Detalle: ${(err instanceof Error ? err.message : String(err))}`,
           iterations,
           precisionConfig: { decimals },
           semanticValidation,
@@ -128,10 +128,10 @@ export function calculateSecant(
       semanticValidation,
       recommendation,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      errorMessage: error.message || 'Error inesperado durante el cálculo por el método de la Secante.',
+      errorMessage: (error instanceof Error ? error.message : String(error)) || 'Error inesperado durante el cálculo por el método de la Secante.',
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,

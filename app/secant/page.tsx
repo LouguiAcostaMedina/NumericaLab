@@ -44,8 +44,8 @@ export default function SecantPage() {
             setResult(response);
           }
         }
-      } catch (err: any) {
-        setErrorMessage(err.message || 'Error al ejecutar el algoritmo de la Secante.');
+      } catch (err: unknown) {
+        setErrorMessage((err instanceof Error ? err.message : String(err)) || 'Error al ejecutar el algoritmo de la Secante.');
       } finally {
         setIsLoading(false);
       }

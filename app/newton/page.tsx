@@ -68,8 +68,8 @@ export default function NewtonPage() {
             setResult(response);
           }
         }
-      } catch (err: any) {
-        setErrorMessage(err.message || 'Error al ejecutar el algoritmo de Newton-Raphson.');
+      } catch (err: unknown) {
+        setErrorMessage((err instanceof Error ? err.message : String(err)) || 'Error al ejecutar el algoritmo de Newton-Raphson.');
       } finally {
         setIsLoading(false);
       }

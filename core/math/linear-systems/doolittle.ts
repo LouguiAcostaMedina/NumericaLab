@@ -85,12 +85,12 @@ export function solveDoolittle(A: Matrix, B: Vector): DoolittleResult {
       factorization,
       solution
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
       originalA: A,
       originalB: B,
-      errorMessage: error.message || 'Error desconocido durante la factorización de Doolittle.'
+      errorMessage: (error instanceof Error ? error.message : String(error)) || 'Error desconocido durante la factorización de Doolittle.'
     };
   }
 }

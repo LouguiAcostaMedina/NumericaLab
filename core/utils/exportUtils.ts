@@ -169,7 +169,7 @@ export class ExportUtils {
     XLSX.utils.book_append_sheet(wb, wsTheoretical, 'Análisis Teórico');
 
     // Hoja 3: Desglose de Iteraciones de Müller (Tabla Completa de Convergencia)
-    const iterationsData: any[] = [];
+    const iterationsData: Record<string, unknown>[] = [];
     result.roots.forEach((r) => {
       r.iterations.forEach((it) => {
         iterationsData.push({

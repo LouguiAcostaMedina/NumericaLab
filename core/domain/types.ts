@@ -40,7 +40,7 @@ export interface SemanticValidationResult {
   severity: 'error' | 'warning' | 'info';
   message: string;
   suggestion?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 /**

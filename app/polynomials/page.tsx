@@ -72,8 +72,8 @@ export default function PolynomialsPage() {
           success: true,
         });
       }
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Error inesperado durante el procesamiento.');
+    } catch (err: unknown) {
+      setErrorMessage((err instanceof Error ? err.message : String(err)) || 'Error inesperado durante el procesamiento.');
       setResult(null);
       setIirResult(null);
     } finally {

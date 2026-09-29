@@ -73,6 +73,8 @@ export function MethodForm({ method, isLoading = false, onSubmit }: MethodFormPr
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
     resetToSmartDefaults();
   }, [method]);
 

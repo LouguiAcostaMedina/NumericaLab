@@ -35,8 +35,8 @@ export default function LagrangePage() {
         } else {
           setErrorMessage(response.errorMessage || 'Error desconocido.');
         }
-      } catch (err: any) {
-        setErrorMessage(err.message || 'Error al ejecutar la interpolación de Lagrange.');
+      } catch (err: unknown) {
+        setErrorMessage((err instanceof Error ? err.message : String(err)) || 'Error al ejecutar la interpolación de Lagrange.');
       } finally {
         setIsLoading(false);
       }

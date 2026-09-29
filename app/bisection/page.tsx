@@ -62,8 +62,8 @@ export default function BisectionPage() {
         } else {
           setErrorMessage(response.errorMessage || 'Error desconocido.');
         }
-      } catch (err: any) {
-        setErrorMessage(err.message || 'Error al ejecutar el algoritmo de Bisección.');
+      } catch (err: unknown) {
+        setErrorMessage((err instanceof Error ? err.message : String(err)) || 'Error al ejecutar el algoritmo de Bisección.');
       } finally {
         setIsLoading(false);
       }
