@@ -108,6 +108,24 @@ export default function Home() {
           />
         </div>
       </section>
+
+      {/* Category: Interpolación */}
+      <section className="space-y-6">
+        <div className="border-b border-border pb-2">
+          <h2 className="text-2xl font-bold text-foreground">Interpolación</h2>
+          <p className="text-sm text-foreground-muted mt-1">Aproximación de funciones mediante polinomios</p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <MethodCard 
+            title="Interpolación de Lagrange"
+            description="Construye un polinomio que pasa exactamente por un conjunto de puntos y permite estimar valores intermedios."
+            icon="📈"
+            href="/interpolacion/lagrange"
+            isNew
+          />
+        </div>
+      </section>
       
       {/* Help / Instructions Footer */}
       <section className="bg-surface-secondary rounded-xl p-6 border border-border text-sm">
