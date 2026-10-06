@@ -2,8 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { PolynomialForm } from '../../components/PolynomialForm';
-import { PolynomialResultsView } from '../../components/PolynomialResultsView';
 import { PolynomialSolver } from '../../core/math/polynomialSolver';
+import dynamic from 'next/dynamic';
+
+const PolynomialResultsView = dynamic(() => import('../../components/PolynomialResultsView').then(mod => mod.PolynomialResultsView), {
+  ssr: false,
+});
 import { IIRFilterAnalyzer } from '../../core/math/iirFilter';
 import { HistoryStorage } from '../../core/utils/historyStorage';
 import { PolynomialSolverResult, IIRFilterStabilityResult } from '../../core/domain/types';
