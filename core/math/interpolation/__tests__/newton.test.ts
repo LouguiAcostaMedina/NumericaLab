@@ -41,6 +41,22 @@ describe('Newton Interpolation (Divided Differences)', () => {
     expect(result.verification[2].calculated).toBeCloseTo(110, 5);
     expect(result.verification[3].calculated).toBeCloseTo(220, 5);
 
+    // Check divided differences table structure
+    expect(result.dividedDifferencesTable.length).toBe(4);
+    expect(result.dividedDifferencesTable[0]).toEqual([45, 65, 110, 220]);
+    expect(result.dividedDifferencesTable[1][0]).toBeCloseTo(20, 5);
+    expect(result.dividedDifferencesTable[1][1]).toBeCloseTo(22.5, 5);
+    expect(result.dividedDifferencesTable[1][2]).toBeCloseTo(110/3, 5);
+    expect(result.dividedDifferencesTable[2][0]).toBeCloseTo(5/6, 5);
+    expect(result.dividedDifferencesTable[2][1]).toBeCloseTo(17/6, 5);
+    expect(result.dividedDifferencesTable[3][0]).toBeCloseTo(1/3, 5);
+
+    // Check newton coefficients [45, 20, 5/6, 1/3]
+    expect(result.coefficients[0]).toBeCloseTo(45, 5);
+    expect(result.coefficients[1]).toBeCloseTo(20, 5);
+    expect(result.coefficients[2]).toBeCloseTo(5/6, 5);
+    expect(result.coefficients[3]).toBeCloseTo(1/3, 5);
+
     // Simplified polynomial expected approx: P3(x) = 0.333333x^3 - 1.5x^2 + 22.166667x + 24
     // Checking coefficients array [a0, a1, a2, a3] -> 24, 22.166667, -1.5, 0.333333
     expect(result.polynomialCoefficients[0]).toBeCloseTo(24, 5);

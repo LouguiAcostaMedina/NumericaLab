@@ -113,11 +113,23 @@ export function calculateNewtonInterpolation(points: InterpolationPoint[], xEval
   const table: number[][] = [];
   table[0] = points.map(p => p.y); // Fila 0: f(xi)
 
+  const diffSteps: string[] = [];
+
   for (let j = 1; j < n; j++) {
     table[j] = [];
+    let diffLinesForOrder = '';
     for (let i = 0; i < n - j; i++) {
-      table[j][i] = (table[j - 1][i + 1] - table[j - 1][i]) / (points[i + j].x - points[i].x);
+      const num1 = table[j - 1][i + 1];
+      const num2 = table[j - 1][i];
+      const den1 = points[i + j].x;
+      const den2 = points[i].x;
+      table[j][i] = (num1 - num2) / (den1 - den2);
+      
+      const args = Array.from({length: j+1}, (_, idx) => `x_${i + idx}`).join(',');
+      const formattedResult = toFractionStr(table[j][i]);
+      diffLinesForOrder += `f[${args}] = \\frac{${toFractionStr(num1)} - ${toFractionStr(num2)}}{${den1} - ${den2}} = ${formattedResult} \\newline\n`;
     }
+    diffSteps.push(diffLinesForOrder);
   }
 
   // Los coeficientes son el primer elemento de cada fila de diferencias divididas
@@ -215,6 +227,16 @@ export function calculateNewtonInterpolation(points: InterpolationPoint[], xEval
     title: 'Paso 1: Tabla de Diferencias Divididas',
     description: 'Calculamos las diferencias divididas sucesivas. La primera columna es x, la segunda es f(x). Los coeficientes del polinomio corresponden a la primera fila (o diagonal superior).',
     matrixData: matrixData
+  });
+
+  diffSteps.forEach((stepTex, index) => {
+    manualProcedure.push({
+      id: `newton-diff-${index}`,
+      type: 'FORMULA_DERIVATION',
+      title: `${index + 1}ª diferencia:`,
+      description: `Cálculo de las diferencias de orden ${index + 1}:`,
+      mathExpression: stepTex
+    });
   });
 
   manualProcedure.push({
