@@ -126,6 +126,12 @@ export default function Home() {
             description="Construye un polinomio que pasa exactamente por un conjunto de puntos y permite estimar valores intermedios."
             icon="📈"
             href="/interpolacion/lagrange"
+          />
+          <MethodCard 
+            title="Interpolación de Newton"
+            description="Utiliza el método de diferencias divididas para construir un polinomio interpolante eficiente paso a paso."
+            icon="📊"
+            href="/interpolacion/newton"
             isNew
           />
         </div>

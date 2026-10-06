@@ -144,6 +144,9 @@ export function Sidebar() {
               <SidebarLink href="/interpolacion/lagrange">
                 Lagrange
               </SidebarLink>
+              <SidebarLink href="/interpolacion/newton">
+                Newton (Diferencias Divididas)
+              </SidebarLink>
             </div>
           </div>
         </nav>

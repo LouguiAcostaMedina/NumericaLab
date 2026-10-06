@@ -10,13 +10,13 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import { LagrangeResult } from '../../core/domain/types';
+import { LagrangeResult, NewtonInterpolationResult } from '../../core/domain/types';
 
-interface LagrangeChartProps {
-  result: LagrangeResult;
+interface InterpolationChartProps {
+  result: LagrangeResult | NewtonInterpolationResult;
 }
 
-export function LagrangeChart({ result }: LagrangeChartProps) {
+export function InterpolationChart({ result }: InterpolationChartProps) {
   if (!result.success) return null;
 
   // Preparar datos para Recharts

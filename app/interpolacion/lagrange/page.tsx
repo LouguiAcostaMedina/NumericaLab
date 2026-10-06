@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LagrangeInput } from '../../../components/interpolation/LagrangeInput';
+import { InterpolationInput } from '../../../components/interpolation/InterpolationInput';
 import { LagrangeResults } from '../../../components/interpolation/LagrangeResults';
-import { LagrangeChart } from '../../../components/interpolation/LagrangeChart';
+import { InterpolationChart } from '../../../components/interpolation/InterpolationChart';
 import { SkeletonLoader } from '../../../components/SkeletonLoader';
 import { calculateLagrange } from '../../../core/math/interpolation/lagrange';
 import { LagrangeResult } from '../../../core/domain/types';
@@ -61,7 +61,7 @@ export default function LagrangePage() {
       <div className="grid lg:grid-cols-3 gap-8 items-start">
         {/* Columna de Formulario */}
         <div className="lg:col-span-1">
-          <LagrangeInput isLoading={isLoading} onSubmit={handleCalculate} />
+          <InterpolationInput isLoading={isLoading} onSubmit={handleCalculate} />
         </div>
 
         {/* Columna de Resultados */}
@@ -110,7 +110,7 @@ export default function LagrangePage() {
 
               {/* Gráfica de Interpolación */}
               {result && (
-                <LagrangeChart result={result} />
+                <InterpolationChart result={result} />
               )}
 
               {/* Procedimiento Matemático Detallado */}

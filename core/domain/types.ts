@@ -355,3 +355,22 @@ export interface LagrangeResult {
   manualProcedure?: ProcedureStep[];
 }
 
+export interface NewtonInterpolationResult {
+  success: boolean;
+  points: InterpolationPoint[];
+  evaluationPoint?: number;
+  dividedDifferencesTable: number[][]; // Table where table[j][i] is the j-th divided difference starting at index i
+  coefficients: number[]; // First element of each column (or row depending on orientation) in the divided differences table
+  polynomialExpression: string; // f[x0] + f[x0,x1](x-x0) + ...
+  simplifiedPolynomial: string; // a3 x^3 + a2 x^2 + a1 x + a0
+  polynomialCoefficients: number[]; // [a0, a1, a2, a3] -> a0 + a1*x + a2*x^2 + a3*x^3
+  interpolatedValue?: number;
+  curvePoints: InterpolationPoint[];
+  verification: {
+    point: InterpolationPoint;
+    calculated: number;
+    isCorrect: boolean;
+  }[];
+  errorMessage?: string;
+  manualProcedure?: ProcedureStep[];
+}

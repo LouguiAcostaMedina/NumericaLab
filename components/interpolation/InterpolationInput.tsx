@@ -6,21 +6,21 @@ export interface InterpolationPointInput {
   y: string;
 }
 
-interface LagrangeInputProps {
+interface InterpolationInputProps {
   isLoading: boolean;
   onSubmit: (points: { x: number; y: number }[], xEval?: number) => void;
 }
 
 const DEFAULT_POINTS: InterpolationPointInput[] = [
-  { id: '1', x: '2', y: '150' },
-  { id: '2', x: '4', y: '85' },
-  { id: '3', x: '8', y: '50' },
-  { id: '4', x: '12', y: '70' }
+  { id: '1', x: '1', y: '45' },
+  { id: '2', x: '2', y: '65' },
+  { id: '3', x: '4', y: '110' },
+  { id: '4', x: '7', y: '220' }
 ];
 
-export function LagrangeInput({ isLoading, onSubmit }: LagrangeInputProps) {
+export function InterpolationInput({ isLoading, onSubmit }: InterpolationInputProps) {
   const [points, setPoints] = useState<InterpolationPointInput[]>(DEFAULT_POINTS);
-  const [xEval, setXEval] = useState<string>('6');
+  const [xEval, setXEval] = useState<string>('5');
   const [error, setError] = useState<string | null>(null);
 
   const handleAddPoint = () => {
@@ -42,7 +42,7 @@ export function LagrangeInput({ isLoading, onSubmit }: LagrangeInputProps) {
 
   const loadExample = () => {
     setPoints(DEFAULT_POINTS);
-    setXEval('6');
+    setXEval('5');
     setError(null);
   };
 
