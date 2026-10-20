@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Matrix, Vector, DoolittleResult } from '../../../core/domain/types';
+import { ManualSolutionView } from '../../procedures/ManualSolutionView';
 
 interface DoolittleResultsViewProps {
   result: DoolittleResult;
@@ -189,6 +190,8 @@ export function DoolittleResultsView({ result, onSolveNewB }: DoolittleResultsVi
           </button>
         </form>
       </section>
+
+      <ManualSolutionView steps={result.manualProcedure} />
     </div>
   );
 }

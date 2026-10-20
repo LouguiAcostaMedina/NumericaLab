@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { IterativeResult } from '../../../core/domain/types';
+import { ManualSolutionView } from '../../procedures/ManualSolutionView';
 
 interface IterativeResultsViewProps {
   result: IterativeResult;
@@ -232,6 +233,7 @@ export function IterativeResultsView({ result }: IterativeResultsViewProps) {
       </div>
 
       {renderTable()}
+      <ManualSolutionView steps={result.manualProcedure} />
     </div>
   );
 }

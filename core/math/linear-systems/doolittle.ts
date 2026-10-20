@@ -1,4 +1,4 @@
-import { Matrix, Vector, DoolittleFactorization, DoolittleSolution, DoolittleResult } from '../../domain/types';
+import { Matrix, Vector, DoolittleFactorization, DoolittleSolution, DoolittleResult, ProcedureStep } from '../../domain/types';
 import { createIdentityMatrix, multiplyMatrix, multiplyMatrixVector, areMatricesAlmostEqual, areVectorsAlmostEqual } from './matrix-utils';
 import { forwardSubstitution, backwardSubstitution } from './substitutions';
 
@@ -78,19 +78,51 @@ export function solveDoolittle(A: Matrix, B: Vector): DoolittleResult {
     const factorization = factorizeDoolittle(A);
     const solution = solveWithLU(factorization.L, factorization.U, B, A);
 
+    const manualProcedure: ProcedureStep[] = [
+      {
+        id: 'doolittle-1',
+        type: 'MATRIX_CALCULATION',
+        title: 'Paso 1: Construcción de Matriz L',
+        description: 'La matriz triangular inferior L se construye colocando 1s en la diagonal y los multiplicadores m_{ij} correspondientes a las operaciones de reducción.',
+        matrixData: factorization.L
+      },
+      {
+        id: 'doolittle-2',
+        type: 'MATRIX_CALCULATION',
+        title: 'Paso 2: Construcción de Matriz U',
+        description: 'La matriz triangular superior U es el resultado de la reducción gaussiana directa (sin escalado).',
+        matrixData: factorization.U
+      },
+      {
+        id: 'doolittle-3',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Paso 3: Sustitución Hacia Adelante (LY = B)',
+        description: `Resolvemos el sistema LY = B para hallar el vector intermedio Y. Resultado: Y = [${solution.Y.map(y => y.toFixed(4)).join(', ')}]`,
+        mathExpression: 'L \\cdot Y = B'
+      },
+      {
+        id: 'doolittle-4',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Paso 4: Sustitución Hacia Atrás (UX = Y)',
+        description: `Resolvemos el sistema UX = Y para hallar el vector solución X. Resultado: X = [${solution.X.map(x => x.toFixed(4)).join(', ')}]`,
+        mathExpression: 'U \\cdot X = Y'
+      }
+    ];
+
     return {
       success: true,
       originalA: A,
       originalB: B,
       factorization,
-      solution
+      solution,
+      manualProcedure
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
       originalA: A,
       originalB: B,
-      errorMessage: error.message || 'Error desconocido durante la factorización de Doolittle.'
+      errorMessage: (error instanceof Error ? error.message : String(error)) || 'Error desconocido durante la factorización de Doolittle.'
     };
   }
 }

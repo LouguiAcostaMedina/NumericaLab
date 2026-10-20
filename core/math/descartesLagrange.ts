@@ -27,7 +27,7 @@ export class DescartesLagrange {
 
     // 1. Contar raíces en x = 0 (coeficientes cero al final)
     let zeroRootsCount = 0;
-    let trimmedCoeffs = [...coeffs];
+    const trimmedCoeffs = [...coeffs];
     while (trimmedCoeffs.length > 0 && Math.abs(trimmedCoeffs[trimmedCoeffs.length - 1]) < 1e-12) {
       zeroRootsCount++;
       trimmedCoeffs.pop();
@@ -104,7 +104,7 @@ export class DescartesLagrange {
     let a_n = coeffs[0];
 
     // Normalizar si a_n < 0 para que el coeficiente principal sea positivo
-    let normCoeffs = coeffs.map((c) => (a_n < 0 ? -c : c));
+    const normCoeffs = coeffs.map((c) => (a_n < 0 ? -c : c));
     a_n = normCoeffs[0];
 
     // 1. Cota Superior de Lagrange para Raíces Reales Positivas
@@ -117,7 +117,7 @@ export class DescartesLagrange {
       return power % 2 !== 0 ? -c : c;
     });
 
-    let pNegNorm = pNegCoeffs[0] < 0 ? pNegCoeffs.map((c) => -c) : pNegCoeffs;
+    const pNegNorm = pNegCoeffs[0] < 0 ? pNegCoeffs.map((c) => -c) : pNegCoeffs;
     const lagrangeUpperNeg = this.lagrangeSingleBound(pNegNorm);
     const lagrangeLowerReal = -lagrangeUpperNeg;
 

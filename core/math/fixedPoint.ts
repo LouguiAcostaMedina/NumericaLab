@@ -1,4 +1,4 @@
-import { FixedPointIteration, MethodResponse } from '../domain/types';
+import { FixedPointIteration, MethodResponse, ProcedureStep } from '../domain/types';
 import { MathParser } from './MathParser';
 import { MethodRecommender } from './methodRecommender';
 import { PrecisionUtils } from './precisionUtils';
@@ -53,10 +53,10 @@ export function calculateFixedPoint(
     for (let iter = 1; iter <= maxIterations; iter++) {
       try {
         gxi = MathParser.evaluate(gExpression, { x: xi });
-      } catch (err: any) {
+      } catch (err: unknown) {
         return {
           success: false,
-          errorMessage: `Error al evaluar g(x) en x = ${PrecisionUtils.format(xi, decimals)}. Detalle: ${err.message}`,
+          errorMessage: `Error al evaluar g(x) en x = ${PrecisionUtils.format(xi, decimals)}. Detalle: ${(err instanceof Error ? err.message : String(err))}`,
           iterations,
           precisionConfig: { decimals },
           semanticValidation,
@@ -95,6 +95,18 @@ export function calculateFixedPoint(
       xi = gxi;
     }
 
+    const manualProcedure: ProcedureStep[] = [];
+    if (iterations.length > 0) {
+      const i1 = iterations[0];
+      manualProcedure.push({
+        id: 'fixpt-1',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Evaluación en g(x)',
+        description: `Evaluamos el valor inicial en la función despejada g(x) para obtener la nueva estimación de x.`,
+        mathExpression: `x_1 = g(${i1.xi}) = ${i1.gxi}`
+      });
+    }
+
     return {
       success: true,
       root: PrecisionUtils.round(gxi, decimals),
@@ -102,11 +114,12 @@ export function calculateFixedPoint(
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,
+      manualProcedure
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      errorMessage: error.message || 'Error inesperado durante el cálculo por Punto Fijo.',
+      errorMessage: (error instanceof Error ? error.message : String(error)) || 'Error inesperado durante el cálculo por Punto Fijo.',
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,

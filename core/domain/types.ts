@@ -40,7 +40,7 @@ export interface SemanticValidationResult {
   severity: 'error' | 'warning' | 'info';
   message: string;
   suggestion?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 /**
@@ -58,6 +58,17 @@ export interface MethodRecommendation {
 /**
  * Estructura de respuesta estándar para cualquier método numérico.
  */
+export type StepType = 'SYSTEM_SETUP' | 'FORMULA_DERIVATION' | 'MATRIX_CALCULATION' | 'ITERATION_SUBSTITUTION' | 'FINAL_RESULT';
+
+export interface ProcedureStep {
+  id: string;
+  type: StepType;
+  title: string;
+  mathExpression?: string;
+  matrixData?: Matrix;
+  description: string;
+}
+
 export interface MethodResponse<T> {
   success: boolean;
   root?: number;
@@ -66,6 +77,7 @@ export interface MethodResponse<T> {
   precisionConfig?: PrecisionConfig;
   semanticValidation?: SemanticValidationResult;
   recommendation?: MethodRecommendation;
+  manualProcedure?: ProcedureStep[];
 }
 
 /**
@@ -240,6 +252,7 @@ export interface DoolittleResult {
   factorization?: DoolittleFactorization;
   solution?: DoolittleSolution;
   errorMessage?: string;
+  manualProcedure?: ProcedureStep[];
 }
 
 // ============================================================================
@@ -303,4 +316,61 @@ export interface IterativeResult {
   solution: Vector;
   status: IterativeStatus;
   errorMessage?: string;
+  manualProcedure?: ProcedureStep[];
+}
+
+// ============================================================================
+// Tipos para Interpolación
+// ============================================================================
+
+export interface InterpolationPoint {
+  x: number;
+  y: number;
+}
+
+export interface LagrangeBasis {
+  index: number;
+  numeratorFactors: number[]; // the (x - xi) values
+  denominator: number;        // the (xk - xi) product
+  expandedNumerator?: string;
+  basisExpression: string;    // Forma producto de Lk(x)
+}
+
+export interface LagrangeResult {
+  success: boolean;
+  points: InterpolationPoint[];
+  evaluationPoint?: number;
+  basisPolynomials: LagrangeBasis[];
+  polynomialExpression: string; // y0*L0(x) + y1*L1(x) + ...
+  simplifiedPolynomial: string; // a3 x^3 + a2 x^2 + a1 x + a0
+  polynomialCoefficients: number[]; // [a0, a1, a2, a3] -> a0 + a1*x + a2*x^2 + a3*x^3
+  interpolatedValue?: number;
+  curvePoints: InterpolationPoint[];
+  verification: {
+    point: InterpolationPoint;
+    calculated: number;
+    isCorrect: boolean;
+  }[];
+  errorMessage?: string;
+  manualProcedure?: ProcedureStep[];
+}
+
+export interface NewtonInterpolationResult {
+  success: boolean;
+  points: InterpolationPoint[];
+  evaluationPoint?: number;
+  dividedDifferencesTable: number[][]; // Table where table[j][i] is the j-th divided difference starting at index i
+  coefficients: number[]; // First element of each column (or row depending on orientation) in the divided differences table
+  polynomialExpression: string; // f[x0] + f[x0,x1](x-x0) + ...
+  simplifiedPolynomial: string; // a3 x^3 + a2 x^2 + a1 x + a0
+  polynomialCoefficients: number[]; // [a0, a1, a2, a3] -> a0 + a1*x + a2*x^2 + a3*x^3
+  interpolatedValue?: number;
+  curvePoints: InterpolationPoint[];
+  verification: {
+    point: InterpolationPoint;
+    calculated: number;
+    isCorrect: boolean;
+  }[];
+  errorMessage?: string;
+  manualProcedure?: ProcedureStep[];
 }

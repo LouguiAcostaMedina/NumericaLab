@@ -135,6 +135,20 @@ export function Sidebar() {
               </div>
             </div>
           </div>
+
+          <div>
+            <p className="px-2 text-[10px] font-bold text-foreground-muted uppercase tracking-widest mb-3">
+              Interpolación
+            </p>
+            <div className="space-y-1" onClick={closeSidebar}>
+              <SidebarLink href="/interpolacion/lagrange">
+                Lagrange
+              </SidebarLink>
+              <SidebarLink href="/interpolacion/newton">
+                Newton (Diferencias Divididas)
+              </SidebarLink>
+            </div>
+          </div>
         </nav>
 
         {/* Sidebar Footer */}

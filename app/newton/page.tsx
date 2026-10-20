@@ -12,6 +12,7 @@ import { EducationalNarrator } from '../../core/math/educationalNarrator';
 import { MathParser } from '../../core/math/MathParser';
 import { HistoryStorage } from '../../core/utils/historyStorage';
 import { NewtonIteration, MethodResponse } from '../../core/domain/types';
+import { ManualSolutionView } from '../../components/procedures/ManualSolutionView';
 
 export default function NewtonPage() {
   const [result, setResult] = useState<MethodResponse<NewtonIteration> | null>(null);
@@ -68,8 +69,8 @@ export default function NewtonPage() {
             setResult(response);
           }
         }
-      } catch (err: any) {
-        setErrorMessage(err.message || 'Error al ejecutar el algoritmo de Newton-Raphson.');
+      } catch (err: unknown) {
+        setErrorMessage((err instanceof Error ? err.message : String(err)) || 'Error al ejecutar el algoritmo de Newton-Raphson.');
       } finally {
         setIsLoading(false);
       }
@@ -148,6 +149,16 @@ export default function NewtonPage() {
                 <EducationalModePanel
                   narrative={EducationalNarrator.narrateRealMethod('newton', result, currentExpression)}
                 />
+              )}
+
+              {/* Solución Manual Paso a Paso */}
+              {result && result.manualProcedure && (
+                <ManualSolutionView steps={result.manualProcedure} />
+              )}
+
+              {/* Solución Manual Paso a Paso */}
+              {result && result.manualProcedure && (
+                <ManualSolutionView steps={result.manualProcedure} />
               )}
 
               {/* Tabla de Iteraciones */}

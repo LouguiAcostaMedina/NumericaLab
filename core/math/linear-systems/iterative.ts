@@ -7,9 +7,60 @@ import {
   ConvergenceAnalysis,
   SassenfeldAnalysis,
   EDDRowAnalysis,
+  ProcedureStep,
 } from '../../domain/types';
 
 const ZERO_TOLERANCE = 1e-12;
+
+function buildIterativeProcedure(method: 'jacobi' | 'gauss-seidel', A: Matrix, b: Vector, iterations: IterationRecord[]): ProcedureStep[] {
+  const n = A.length;
+  const steps: ProcedureStep[] = [];
+
+  steps.push({
+    id: 'setup-1',
+    type: 'SYSTEM_SETUP',
+    title: 'Paso 1: Planteamiento del Sistema Despejado',
+    description: 'Despejamos cada variable x_i de la diagonal principal para formar las ecuaciones iterativas.',
+    mathExpression: A.map((row, i) => {
+      const terms: string[] = [];
+      for (let j = 0; j < n; j++) {
+        if (i !== j && row[j] !== 0) {
+          const sign = row[j] > 0 ? '-' : '+';
+          const val = Math.abs(row[j]);
+          terms.push(`${sign} ${val}x_${j + 1}`);
+        }
+      }
+      return `x_${i + 1} = (${b[i]} ${terms.join(' ')}) / ${row[i]}`;
+    }).join('\n')
+  });
+
+  for (let k = 1; k < Math.min(3, iterations.length); k++) {
+    const prevX = iterations[k - 1].x;
+    const currentX = iterations[k].x;
+    
+    steps.push({
+      id: `iter-${k}`,
+      type: 'ITERATION_SUBSTITUTION',
+      title: `Iteración ${k}: Sustitución Numérica`,
+      description: `Reemplazamos los valores ${method === 'jacobi' ? 'de la iteración anterior' : 'más recientes'} en las ecuaciones.`,
+      mathExpression: A.map((row, i) => {
+        const terms: string[] = [];
+        for (let j = 0; j < n; j++) {
+          if (i !== j && row[j] !== 0) {
+            const sign = row[j] > 0 ? '-' : '+';
+            const val = Math.abs(row[j]);
+            const subX = method === 'gauss-seidel' && j < i ? currentX[j] : prevX[j];
+            terms.push(`${sign} ${val}(${subX.toFixed(4)})`);
+          }
+        }
+        return `x_${i + 1} = (${b[i]} ${terms.join(' ')}) / ${row[i]} = ${currentX[i].toFixed(6)}`;
+      }).join('\n')
+    });
+  }
+
+  return steps;
+}
+
 
 /**
  * Calculates the infinity norm of the residual vector r = Ax - b
@@ -233,7 +284,8 @@ export function solveJacobi(A: Matrix, b: Vector, config: IterativeMethodConfig)
         finalError: maxRelativeError,
         finalResidual: residualNorm,
         solution: currentX,
-        status: 'converged'
+        status: 'converged',
+        manualProcedure: buildIterativeProcedure('jacobi', A, b, iterations)
       };
     }
   }
@@ -251,7 +303,8 @@ export function solveJacobi(A: Matrix, b: Vector, config: IterativeMethodConfig)
     finalResidual: iterations[iterations.length - 1].residualNorm || 0,
     solution: currentX,
     status: 'max_iterations',
-    errorMessage: "Se alcanzó el número máximo de iteraciones sin satisfacer la tolerancia indicada."
+    errorMessage: "Se alcanzó el número máximo de iteraciones sin satisfacer la tolerancia indicada.",
+    manualProcedure: buildIterativeProcedure('jacobi', A, b, iterations)
   };
 }
 
@@ -362,7 +415,8 @@ export function solveGaussSeidel(A: Matrix, b: Vector, config: IterativeMethodCo
         finalError: maxRelativeError,
         finalResidual: residualNorm,
         solution: [...currentX],
-        status: 'converged'
+        status: 'converged',
+        manualProcedure: buildIterativeProcedure('gauss-seidel', A, b, iterations)
       };
     }
   }
@@ -381,6 +435,7 @@ export function solveGaussSeidel(A: Matrix, b: Vector, config: IterativeMethodCo
     finalResidual: iterations[iterations.length - 1].residualNorm || 0,
     solution: [...currentX],
     status: 'max_iterations',
-    errorMessage: "Se alcanzó el número máximo de iteraciones sin satisfacer la tolerancia indicada."
+    errorMessage: "Se alcanzó el número máximo de iteraciones sin satisfacer la tolerancia indicada.",
+    manualProcedure: buildIterativeProcedure('gauss-seidel', A, b, iterations)
   };
 }

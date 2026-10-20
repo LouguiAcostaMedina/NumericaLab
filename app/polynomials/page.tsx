@@ -2,8 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { PolynomialForm } from '../../components/PolynomialForm';
-import { PolynomialResultsView } from '../../components/PolynomialResultsView';
 import { PolynomialSolver } from '../../core/math/polynomialSolver';
+import dynamic from 'next/dynamic';
+
+const PolynomialResultsView = dynamic(() => import('../../components/PolynomialResultsView').then(mod => mod.PolynomialResultsView), {
+  ssr: false,
+});
 import { IIRFilterAnalyzer } from '../../core/math/iirFilter';
 import { HistoryStorage } from '../../core/utils/historyStorage';
 import { PolynomialSolverResult, IIRFilterStabilityResult } from '../../core/domain/types';
@@ -72,8 +76,8 @@ export default function PolynomialsPage() {
           success: true,
         });
       }
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Error inesperado durante el procesamiento.');
+    } catch (err: unknown) {
+      setErrorMessage((err instanceof Error ? err.message : String(err)) || 'Error inesperado durante el procesamiento.');
       setResult(null);
       setIirResult(null);
     } finally {

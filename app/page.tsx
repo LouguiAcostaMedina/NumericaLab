@@ -6,19 +6,23 @@ export default function Home() {
     <div className="space-y-12 animate-fade-in pb-12">
       
       {/* Hero Section */}
-      <section className="bg-surface rounded-2xl p-6 md:p-10 border border-border flex flex-col md:flex-row items-center justify-between gap-8 shadow-sm">
-        <div className="space-y-4 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest">
+      <section className="bg-surface/80 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-border/50 flex flex-col md:flex-row items-center justify-between gap-10 shadow-xl shadow-black/5 relative overflow-hidden">
+        
+        {/* Decorative background glow */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+
+        <div className="space-y-6 max-w-2xl relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest border border-primary/20 shadow-inner">
             <span>Análisis Numérico</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-            Bienvenido a NuméricaLab
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
+            Bienvenido a <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">NuméricaLab</span>
           </h1>
           <p className="text-foreground-muted text-base md:text-lg leading-relaxed">
             Plataforma interactiva para visualizar y calcular métodos numéricos. Encuentra raíces de ecuaciones no lineales y resuelve sistemas matriciales con explicaciones paso a paso.
           </p>
         </div>
-        <div className="hidden md:flex text-9xl text-primary/5 select-none font-serif">
+        <div className="hidden md:flex text-[12rem] text-primary/5 select-none font-serif leading-none drop-shadow-sm relative z-10">
           ∫
         </div>
       </section>
@@ -105,6 +109,30 @@ export default function Home() {
             icon="🔄"
             href="#"
             isDisabled
+          />
+        </div>
+      </section>
+
+      {/* Category: Interpolación */}
+      <section className="space-y-6">
+        <div className="border-b border-border pb-2">
+          <h2 className="text-2xl font-bold text-foreground">Interpolación</h2>
+          <p className="text-sm text-foreground-muted mt-1">Aproximación de funciones mediante polinomios</p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <MethodCard 
+            title="Interpolación de Lagrange"
+            description="Construye un polinomio que pasa exactamente por un conjunto de puntos y permite estimar valores intermedios."
+            icon="📈"
+            href="/interpolacion/lagrange"
+          />
+          <MethodCard 
+            title="Interpolación de Newton"
+            description="Utiliza el método de diferencias divididas para construir un polinomio interpolante eficiente paso a paso."
+            icon="📊"
+            href="/interpolacion/newton"
+            isNew
           />
         </div>
       </section>

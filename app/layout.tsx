@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { Inter, Fira_Code } from "next/font/google";
 import { Sidebar } from "../components/Sidebar";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const firaCode = Fira_Code({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: "NuméricaLab | Análisis Numérico Web",
@@ -13,8 +17,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className="h-full antialiased">
-      <body className="h-full bg-background text-foreground font-sans flex flex-col lg:flex-row overflow-hidden">
+    <html lang="es" className={`h-full antialiased ${inter.variable} ${firaCode.variable}`} suppressHydrationWarning>
+      <body className="h-full bg-background text-foreground font-sans flex flex-col lg:flex-row overflow-hidden" suppressHydrationWarning>
+        {/* Subtle background animation */}
+        <div className="bg-math-mesh"></div>
         
         {/* Sidebar Component (Handles both Mobile Header/Drawer and Desktop Sidebar) */}
         <Sidebar />

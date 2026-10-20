@@ -115,51 +115,52 @@ export function ResultsTable(props: ResultsTableProps) {
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h4 className="text-md font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-          <span>📋</span> Tabla de Iteraciones
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/50 pb-4">
+        <h4 className="text-md font-bold text-foreground flex items-center gap-2 tracking-tight">
+          <span className="p-1.5 bg-surface-secondary rounded-md shadow-inner text-sm">📋</span>
+          <span>Tabla de Iteraciones</span>
         </h4>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-zinc-500 font-mono">
+          <span className="text-xs text-foreground-muted font-mono bg-surface-secondary px-2 py-1 rounded border border-border/50">
             {data.length} iteraciones
           </span>
           
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-all duration-200 cursor-pointer active:scale-95 shadow-2xs hover:scale-102"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border/50 text-xs font-semibold bg-surface hover:bg-surface-secondary text-foreground transition-all duration-200 cursor-pointer active:scale-95 shadow-sm hover:shadow-md"
             >
-              📥 Exportar Resultados <span className="text-[10px] text-zinc-400 dark:text-zinc-500">▼</span>
+              📥 Exportar <span className="text-[10px] text-foreground-muted">▼</span>
             </button>
             
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-1.5 w-52 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg z-50 py-1 font-sans animate-fade-in">
+              <div className="absolute right-0 mt-1.5 w-52 bg-surface/90 backdrop-blur-md border border-border/50 rounded-xl shadow-xl shadow-black/10 z-50 py-1.5 font-sans animate-fade-in">
                 <button
                   onClick={() => {
-                    exportToCSV(data, type);
+                    exportToCSV(data as any as Record<string, unknown>[], type);
                     setIsDropdownOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2.5 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-850 transition-colors flex items-center gap-2.5 cursor-pointer font-medium"
+                  className="w-full text-left px-4 py-2.5 text-xs text-foreground hover:bg-surface-secondary transition-colors flex items-center gap-2.5 cursor-pointer font-medium"
                 >
-                  <span className="text-zinc-400">📄</span> Descargar CSV (.csv)
+                  <span className="text-foreground-muted">📄</span> Descargar CSV (.csv)
                 </button>
                 <button
                   onClick={() => {
-                    exportToExcel(data, type);
+                    exportToExcel(data as any as Record<string, unknown>[], type);
                     setIsDropdownOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2.5 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-850 transition-colors flex items-center gap-2.5 cursor-pointer font-medium"
+                  className="w-full text-left px-4 py-2.5 text-xs text-foreground hover:bg-surface-secondary transition-colors flex items-center gap-2.5 cursor-pointer font-medium"
                 >
-                  <span className="text-zinc-400">📊</span> Descargar Excel (.xlsx)
+                  <span className="text-foreground-muted">📊</span> Descargar Excel (.xlsx)
                 </button>
                 <button
                   onClick={() => {
-                    exportToPDF(data, type, getMethodName(type));
+                    exportToPDF(data as any as Record<string, unknown>[], type, getMethodName(type));
                     setIsDropdownOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2.5 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-850 transition-colors flex items-center gap-2.5 cursor-pointer font-medium"
+                  className="w-full text-left px-4 py-2.5 text-xs text-foreground hover:bg-surface-secondary transition-colors flex items-center gap-2.5 cursor-pointer font-medium"
                 >
-                  <span className="text-zinc-400">📕</span> Descargar Reporte PDF (.pdf)
+                  <span className="text-foreground-muted">📕</span> Descargar Reporte PDF (.pdf)
                 </button>
               </div>
             )}

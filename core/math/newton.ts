@@ -1,4 +1,4 @@
-import { NewtonIteration, MethodResponse } from '../domain/types';
+import { NewtonIteration, MethodResponse, ProcedureStep } from '../domain/types';
 import { MathParser } from './MathParser';
 import { MethodRecommender } from './methodRecommender';
 import { PrecisionUtils } from './precisionUtils';
@@ -57,10 +57,10 @@ export function calculateNewtonRaphson(
     let derivativeExpression: string;
     try {
       derivativeExpression = MathParser.derivative(expression, 'x');
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         success: false,
-        errorMessage: `No se pudo calcular la derivada simbólica de la función. Detalle: ${err.message}`,
+        errorMessage: `No se pudo calcular la derivada simbólica de la función. Detalle: ${(err instanceof Error ? err.message : String(err))}`,
         precisionConfig: { decimals },
         semanticValidation,
         recommendation,
@@ -113,6 +113,25 @@ export function calculateNewtonRaphson(
       xi = xiNext;
     }
 
+    const manualProcedure: ProcedureStep[] = [];
+    if (iterations.length > 0) {
+      const i1 = iterations[0];
+      manualProcedure.push({
+        id: 'newton-1',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Evaluación en x_0',
+        description: `Evaluamos la función y su derivada analítica en la semilla inicial x_0.`,
+        mathExpression: `f(${i1.xi}) = ${i1.fxi} \\n f'(${i1.xi}) = ${i1.dfxi}`
+      });
+      manualProcedure.push({
+        id: 'newton-2',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Cálculo del Siguiente Punto',
+        description: `Aplicamos la fórmula iterativa de Newton-Raphson para obtener x_1.`,
+        mathExpression: `x_1 = ${i1.xi} - (${i1.fxi} / ${i1.dfxi}) = ${i1.xiNext}`
+      });
+    }
+
     return {
       success: true,
       root: PrecisionUtils.round(xiNext, decimals),
@@ -120,11 +139,12 @@ export function calculateNewtonRaphson(
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,
+      manualProcedure
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      errorMessage: error.message || 'Error inesperado durante el cálculo por Newton-Raphson.',
+      errorMessage: (error instanceof Error ? error.message : String(error)) || 'Error inesperado durante el cálculo por Newton-Raphson.',
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,

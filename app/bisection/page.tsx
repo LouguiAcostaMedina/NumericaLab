@@ -6,11 +6,17 @@ import { ResultsTable } from '../../components/ResultsTable';
 import { ConvergenceChart } from '../../components/ConvergenceChart';
 import { SkeletonLoader } from '../../components/SkeletonLoader';
 import { EducationalModePanel } from '../../components/EducationalModePanel';
-import { MethodComparator } from '../../components/MethodComparator';
 import { calculateBisection } from '../../core/math/bisection';
 import { EducationalNarrator } from '../../core/math/educationalNarrator';
 import { HistoryStorage } from '../../core/utils/historyStorage';
 import { BisectionIteration, MethodResponse } from '../../core/domain/types';
+import { ManualSolutionView } from '../../components/procedures/ManualSolutionView';
+import dynamic from 'next/dynamic';
+
+const MethodComparator = dynamic(() => import('../../components/MethodComparator').then(mod => mod.MethodComparator), {
+  ssr: false,
+  loading: () => <SkeletonLoader type="both" />
+});
 
 export default function BisectionPage() {
   const [result, setResult] = useState<MethodResponse<BisectionIteration> | null>(null);
@@ -62,8 +68,8 @@ export default function BisectionPage() {
         } else {
           setErrorMessage(response.errorMessage || 'Error desconocido.');
         }
-      } catch (err: any) {
-        setErrorMessage(err.message || 'Error al ejecutar el algoritmo de Bisección.');
+      } catch (err: unknown) {
+        setErrorMessage((err instanceof Error ? err.message : String(err)) || 'Error al ejecutar el algoritmo de Bisección.');
       } finally {
         setIsLoading(false);
       }
@@ -138,6 +144,11 @@ export default function BisectionPage() {
                 <EducationalModePanel
                   narrative={EducationalNarrator.narrateRealMethod('bisection', result, currentExpression)}
                 />
+              )}
+
+              {/* Solución Manual Paso a Paso */}
+              {result && result.manualProcedure && (
+                <ManualSolutionView steps={result.manualProcedure} />
               )}
 
               {/* Tabla de Iteraciones */}

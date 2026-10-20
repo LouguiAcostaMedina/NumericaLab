@@ -7,6 +7,7 @@ import { ConvergenceChart } from '../../components/ConvergenceChart';
 import { SkeletonLoader } from '../../components/SkeletonLoader';
 import { calculateSecant } from '../../core/math/secant';
 import { SecantIteration, MethodResponse } from '../../core/domain/types';
+import { ManualSolutionView } from '../../components/procedures/ManualSolutionView';
 
 export default function SecantPage() {
   const [result, setResult] = useState<MethodResponse<SecantIteration> | null>(null);
@@ -44,8 +45,8 @@ export default function SecantPage() {
             setResult(response);
           }
         }
-      } catch (err: any) {
-        setErrorMessage(err.message || 'Error al ejecutar el algoritmo de la Secante.');
+      } catch (err: unknown) {
+        setErrorMessage((err instanceof Error ? err.message : String(err)) || 'Error al ejecutar el algoritmo de la Secante.');
       } finally {
         setIsLoading(false);
       }
@@ -116,6 +117,11 @@ export default function SecantPage() {
                     </p>
                   </div>
                 </div>
+              )}
+
+              {/* Solución Manual Paso a Paso */}
+              {result && result.manualProcedure && (
+                <ManualSolutionView steps={result.manualProcedure} />
               )}
 
               {/* Results Table */}

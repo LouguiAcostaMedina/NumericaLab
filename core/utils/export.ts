@@ -30,7 +30,7 @@ const headerMapping: Record<string, string> = {
 /**
  * Formatea un valor numérico para exportaciones
  */
-function formatValue(val: any): string {
+function formatValue(val: unknown): string {
   if (val === null || val === undefined) return 'N/A';
   if (typeof val === 'number') {
     if (val === 0) return '0';
@@ -46,7 +46,7 @@ function formatValue(val: any): string {
 /**
  * Genera y descarga un archivo CSV con soporte de BOM para caracteres UTF-8 en Excel.
  */
-export function exportToCSV(data: any[], method: string): void {
+export function exportToCSV(data: Record<string, unknown>[], method: string): void {
   if (!data || data.length === 0) return;
 
   const rawHeaders = Object.keys(data[0]);
@@ -84,12 +84,12 @@ export function exportToCSV(data: any[], method: string): void {
 /**
  * Genera y descarga un archivo de Excel (.xlsx) mapeando los encabezados.
  */
-export function exportToExcel(data: any[], method: string): void {
+export function exportToExcel(data: Record<string, unknown>[], method: string): void {
   if (!data || data.length === 0) return;
 
   // Traducir las filas a un objeto con cabeceras formateadas
   const mappedData = data.map((row) => {
-    const newRow: any = {};
+    const newRow: Record<string, unknown> = {};
     Object.keys(row).forEach((key) => {
       const translated = headerMapping[key] || key;
       newRow[translated] = row[key] === null || row[key] === undefined ? 'N/A' : row[key];
@@ -108,7 +108,7 @@ export function exportToExcel(data: any[], method: string): void {
 /**
  * Genera y descarga un reporte en PDF de alta calidad con jspdf y jspdf-autotable.
  */
-export function exportToPDF(data: any[], method: string, methodName: string): void {
+export function exportToPDF(data: Record<string, unknown>[], method: string, methodName: string): void {
   if (!data || data.length === 0) return;
 
   const doc = new jsPDF();

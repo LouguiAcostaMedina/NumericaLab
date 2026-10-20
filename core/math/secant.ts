@@ -1,4 +1,4 @@
-import { SecantIteration, MethodResponse } from '../domain/types';
+import { SecantIteration, MethodResponse, ProcedureStep } from '../domain/types';
 import { MathParser } from './MathParser';
 import { MethodRecommender } from './methodRecommender';
 import { PrecisionUtils } from './precisionUtils';
@@ -69,10 +69,10 @@ export function calculateSecant(
       try {
         fxiMinus1 = MathParser.evaluate(expression, { x: xiMinus1 });
         fxi = MathParser.evaluate(expression, { x: xi });
-      } catch (err: any) {
+      } catch (err: unknown) {
         return {
           success: false,
-          errorMessage: `Error al evaluar la función. Detalle: ${err.message}`,
+          errorMessage: `Error al evaluar la función. Detalle: ${(err instanceof Error ? err.message : String(err))}`,
           iterations,
           precisionConfig: { decimals },
           semanticValidation,
@@ -120,6 +120,18 @@ export function calculateSecant(
       xi = xiNext;
     }
 
+    const manualProcedure: ProcedureStep[] = [];
+    if (iterations.length > 0) {
+      const i1 = iterations[0];
+      manualProcedure.push({
+        id: 'secant-1',
+        type: 'ITERATION_SUBSTITUTION',
+        title: 'Iteración 1: Fórmula de la Secante',
+        description: `Trazamos una línea secante entre (x_{i-1}, f(x_{i-1})) y (x_i, f(x_i)) y calculamos su intersección con el eje X.`,
+        mathExpression: `x_{i+1} = ${i1.xi} - \\frac{${i1.fxi}(${i1.xi} - ${i1.xiMinus1})}{${i1.fxi} - ${i1.fxiMinus1}} = ${i1.xiNext}`
+      });
+    }
+
     return {
       success: true,
       root: PrecisionUtils.round(xiNext, decimals),
@@ -127,11 +139,12 @@ export function calculateSecant(
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,
+      manualProcedure
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      errorMessage: error.message || 'Error inesperado durante el cálculo por el método de la Secante.',
+      errorMessage: (error instanceof Error ? error.message : String(error)) || 'Error inesperado durante el cálculo por el método de la Secante.',
       precisionConfig: { decimals },
       semanticValidation,
       recommendation,
