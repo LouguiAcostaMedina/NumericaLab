@@ -15,6 +15,23 @@ export class MathParser {
 
     let expr = expression.trim();
 
+    // Reemplazar símbolos tipográficos de multiplicación y comas decimales
+    expr = expr.replace(/[·•]/g, '*');
+    expr = expr.replace(/(\d+),(\d+)/g, '$1.$2');
+
+    // Reemplazar π por pi
+    expr = expr.replace(/π/g, 'pi');
+
+    // Sinónimos en español para funciones trigonométricas comunes
+    expr = expr.replace(/\barcsen\b/gi, 'asin');
+    expr = expr.replace(/\barctg\b/gi, 'atan');
+    expr = expr.replace(/\bsen\b/gi, 'sin');
+    expr = expr.replace(/\btg\b/gi, 'tan');
+
+    // Multiplicación implícita con pi: ej: 2pi -> 2*pi, pi t -> pi*t
+    expr = expr.replace(/(\d+(\.\d+)?)\s*pi\b/gi, '$1*pi');
+    expr = expr.replace(/\bpi\s*([a-zA-Z_])/gi, 'pi*$1');
+
     // Reemplazar notación científica con exponente 'e' o 'E' si es necesario
     // math.js maneja 1e-5 nativamente, pero aseguramos espacios limpios
     expr = expr.replace(/(\d+)\s*e\s*([+-]?\d+)/gi, '$1e$2');

@@ -374,3 +374,53 @@ export interface NewtonInterpolationResult {
   errorMessage?: string;
   manualProcedure?: ProcedureStep[];
 }
+
+// ============================================================================
+// Tipos para Integración Numérica (Sesión 12 - Regla del Trapecio)
+// ============================================================================
+
+export interface TrapezoidNode {
+  i: number;
+  t: number;
+  ft: number;
+  weight: number;            // 0.5 para extremos (t0, tn), 1.0 para nodos interiores
+  coefficient: number;       // 1 para extremos, 2 para interiores (cuando se factoriza h/2)
+  termContribution: number;  // ft * weight
+}
+
+export interface ConvergenceAnalysisRow {
+  n: number;
+  h: number;
+  Tn: number;
+  exactValue?: number;
+  absoluteError?: number;
+  relativeErrorPercent?: number;
+}
+
+export interface TrapezoidMethodResponse {
+  success: boolean;
+  functionExpression: string;
+  variableName: string;
+  a: number;
+  b: number;
+  n: number;
+  h: number;
+  Tn: number;
+  units?: {
+    rateUnit?: string;       // ej: Mbps
+    integralUnit?: string;   // ej: Mb
+    variableUnit?: string;   // ej: segundos (s)
+  };
+  nodes: TrapezoidNode[];
+  manualProcedure?: ProcedureStep[];
+  convergenceTable?: ConvergenceAnalysisRow[];
+  exactReference?: {
+    value: number;
+    expressionDescription: string;
+    isTheoreticalExact: boolean;
+  };
+  curvePoints: { x: number; y: number }[];
+  trapezoidSegments: { x1: number; y1: number; x2: number; y2: number }[];
+  errorMessage?: string;
+  semanticValidation?: SemanticValidationResult;
+}

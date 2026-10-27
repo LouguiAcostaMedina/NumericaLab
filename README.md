@@ -14,7 +14,13 @@ Una plataforma web interactiva de última generación para la resolución de ecu
 
 * **Interpolación y Polinomios**:
   * **Interpolación de Lagrange**: Construcción de los factores $L_k(x)$ y representación simplificada del polinomio interpolador final.
+  * **Interpolación de Newton**: Construcción del polinomio interpolante mediante diferencias divididas.
   * **Raíces de Polinomios (Método de Müller)**: Implementación para raíces complejas en plano y análisis con la Regla de Descartes.
+
+* **Integración Numérica (Sesión 12)**:
+  * **Regla del Trapecio Simple y Compuesto**: Aproximación numérica de integrales definidas mediante partición uniforme en $n$ subintervalos y segmentos lineales secantes (Newton-Cotes cerrado de orden 1).
+  * **Análisis de Convergencia $O(h^2)$**: Tabla comparativa con $n = 4, 10, 50, 100, 1000$ y cálculo de error absoluto y porcentual real contra soluciones exactas.
+  * **Caso de Aplicación en Redes**: Cálculo del volumen de datos transmitidos $R(t)$ en Mbps a Megabits (Mb) en $[0, 12]$ segundos.
 
 * **Cálculo de Raíces No Lineales**:
   * **Bisección**, **Falsa Posición**, **Newton-Raphson**, **Punto Fijo** y la **Secante**.

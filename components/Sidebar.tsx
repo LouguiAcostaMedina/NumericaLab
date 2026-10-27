@@ -149,6 +149,17 @@ export function Sidebar() {
               </SidebarLink>
             </div>
           </div>
+
+          <div>
+            <p className="px-2 text-[10px] font-bold text-foreground-muted uppercase tracking-widest mb-3">
+              Integración Numérica
+            </p>
+            <div className="space-y-1" onClick={closeSidebar}>
+              <SidebarLink href="/integracion-numerica/trapecio">
+                Regla del Trapecio (Sesión 12)
+              </SidebarLink>
+            </div>
+          </div>
         </nav>
 
         {/* Sidebar Footer */}
