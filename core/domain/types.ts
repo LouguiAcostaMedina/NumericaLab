@@ -424,3 +424,87 @@ export interface TrapezoidMethodResponse {
   errorMessage?: string;
   semanticValidation?: SemanticValidationResult;
 }
+
+
+// ============================================================================
+// Tipos para Integración Numérica (Sesión 13 - Reglas de Simpson 1/3 y Simpson 3/8)
+// ============================================================================
+
+export type SimpsonMethodType = 'simpson13' | 'simpson38';
+
+export interface SimpsonNode {
+  i: number;
+  t: number;                 // x_i o t_i
+  ft: number;                // f(t_i)
+  weight: number;            // Factor normalizado o peso
+  coefficient: number;       // Coeficiente entero clásico (1, 4, 2, 4... o 1, 3, 3, 2...)
+  termContribution: number;  // ft * coefficient
+}
+
+export interface SimpsonConvergenceRow {
+  n: number;
+  h: number;
+  Sn: number;
+  exactValue?: number;
+  absoluteError?: number;
+  relativeErrorPercent?: number;
+  errorBoundM045?: number;    // Cota calculada con M = 0.45 (dato proporcionado en la ficha)
+  errorBoundValidM?: number;  // Cota calculada con M válido (ej: M = 5.131103802)
+  errorBoundFormula?: string;
+}
+
+export interface SimpsonErrorBoundAnalysis {
+  formulaLatex: string;
+  mFicha?: {
+    mValue: number;
+    bound: number;
+    label: string;
+    note: string;
+    isGuaranteed: boolean;
+  };
+  mValid?: {
+    mValue: number;
+    bound: number;
+    label: string;
+    note: string;
+    isGuaranteed: boolean;
+  };
+  hasValidM: boolean;
+  missingMMessage?: string;
+}
+
+export interface SimpsonMethodResponse {
+  success: boolean;
+  methodType: SimpsonMethodType; // 'simpson13' | 'simpson38'
+  functionExpression: string;
+  variableName: string;
+  a: number;
+  b: number;
+  n: number;
+  h: number;
+  Sn: number;
+  isTabular?: boolean;
+  tabularPoints?: { x: number; y: number }[];
+  units?: {
+    rateUnit?: string;       // ej: kW, m
+    integralUnit?: string;   // ej: kWh, m²
+    variableUnit?: string;   // ej: h, s, m
+  };
+  nodes: SimpsonNode[];
+  manualProcedure?: ProcedureStep[];
+  convergenceTable?: SimpsonConvergenceRow[];
+  exactReference?: {
+    value: number;
+    expressionDescription: string;
+    isTheoreticalExact: boolean;
+  };
+  errorBoundAnalysis?: SimpsonErrorBoundAnalysis;
+  curvePoints: { x: number; y: number }[];
+  parabolicSegments?: {
+    xStart: number;
+    xEnd: number;
+    points: { x: number; y: number }[];
+  }[];
+  errorMessage?: string;
+  semanticValidation?: SemanticValidationResult;
+}

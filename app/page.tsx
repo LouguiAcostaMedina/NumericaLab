@@ -19,7 +19,7 @@ export default function Home() {
             Bienvenido a <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">NuméricaLab</span>
           </h1>
           <p className="text-foreground-muted text-base md:text-lg leading-relaxed">
-            Plataforma interactiva para visualizar y calcular métodos numéricos. Encuentra raíces de ecuaciones no lineales y resuelve sistemas matriciales con explicaciones paso a paso.
+            Plataforma interactiva para visualizar y calcular métodos numéricos. Encuentra raíces de ecuaciones no lineales, resuelve sistemas matriciales e integra funciones con explicaciones paso a paso.
           </p>
         </div>
         <div className="hidden md:flex text-[12rem] text-primary/5 select-none font-serif leading-none drop-shadow-sm relative z-10">
@@ -87,7 +87,6 @@ export default function Home() {
             description="Descompone la matriz A en dos matrices triangulares L y U para resolver múltiples vectores B."
             icon="🔢"
             href="/sistemas-lineales/doolittle"
-            isNew
           />
           <MethodCard 
             title="Eliminación de Gauss"
@@ -132,24 +131,44 @@ export default function Home() {
             description="Utiliza el método de diferencias divididas para construir un polinomio interpolante eficiente paso a paso."
             icon="📊"
             href="/interpolacion/newton"
-            isNew
           />
         </div>
       </section>
 
       {/* Category: Integración Numérica */}
       <section className="space-y-6">
-        <div className="border-b border-border pb-2">
-          <h2 className="text-2xl font-bold text-foreground">Integración Numérica</h2>
-          <p className="text-sm text-foreground-muted mt-1">Aproximación de integrales definidas mediante métodos de cuadratura</p>
+        <div className="border-b border-border pb-2 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground">Integración Numérica</h2>
+            <p className="text-sm text-foreground-muted mt-1">Aproximación de integrales definidas mediante métodos de Newton-Cotes</p>
+          </div>
+          <Link
+            href="/integracion-numerica"
+            className="text-xs text-primary hover:underline font-semibold"
+          >
+            Ver panel completo →
+          </Link>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <MethodCard 
             title="Regla del Trapecio (Sesión 12)"
-            description="Aproximación de áreas mediante segmentos rectilíneos y trapecios. Incluye análisis de convergencia O(h²) y caso de transmisión de datos."
-            icon="∫"
+            description="Aproximación de áreas mediante segmentos rectilíneos y trapecios. Incluye análisis de convergencia O(h²) y caso de transmisión de datos R(t)."
+            icon="📐"
             href="/integracion-numerica/trapecio"
+          />
+          <MethodCard 
+            title="Simpson 1/3 Compuesto (Sesión 13)"
+            description="Aproximación cuadrática por parábolas (n par). Incluye Actividad Autónoma de potencia P(t), referencias numéricas y cotas con M."
+            icon="⚡"
+            href="/integracion-numerica/simpson-1-3"
+            isNew
+          />
+          <MethodCard 
+            title="Simpson 3/8 Compuesto (Sesión 13)"
+            description="Aproximación cúbica (n múltiplo de 3). Soporta funciones analíticas y datos tabulados equiespaciados (caso del canal de agua)."
+            icon="🌊"
+            href="/integracion-numerica/simpson-3-8"
             isNew
           />
         </div>
@@ -163,8 +182,8 @@ export default function Home() {
         <ul className="list-disc pl-5 space-y-1.5 text-foreground-muted">
           <li>Selecciona el tipo de problema a resolver en las categorías superiores.</li>
           <li>Usa notación estándar matemática (ej: <code className="font-mono text-xs bg-surface px-1.5 py-0.5 rounded border border-border">sin(x) - x/2</code>) para las funciones.</li>
-          <li>En sistemas lineales, puedes reutilizar la misma matriz ingresando un nuevo vector B de forma rápida.</li>
-          <li>Todos los resultados detallan paso a paso el procedimiento numérico realizado.</li>
+          <li>En integración numérica, Simpson 1/3 exige <strong>n par</strong> y Simpson 3/8 exige <strong>n divisible por 3</strong>.</li>
+          <li>Todos los resultados detallan paso a paso el procedimiento numérico y análisis de convergencia.</li>
         </ul>
       </section>
 

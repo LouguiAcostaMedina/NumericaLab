@@ -19,6 +19,15 @@ export class MathParser {
     expr = expr.replace(/[·•]/g, '*');
     expr = expr.replace(/(\d+),(\d+)/g, '$1.$2');
 
+    // Reemplazar superíndices comunes
+    expr = expr.replace(/²/g, '^2');
+    expr = expr.replace(/³/g, '^3');
+    expr = expr.replace(/⁴/g, '^4');
+
+    // Reemplazar símbolo de raíz cuadrada √
+    expr = expr.replace(/√\s*\(([^)]+)\)/g, 'sqrt($1)');
+    expr = expr.replace(/√\s*([a-zA-Z0-9_]+)/g, 'sqrt($1)');
+
     // Reemplazar π por pi
     expr = expr.replace(/π/g, 'pi');
 

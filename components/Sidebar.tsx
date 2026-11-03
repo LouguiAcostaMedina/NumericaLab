@@ -155,8 +155,17 @@ export function Sidebar() {
               Integración Numérica
             </p>
             <div className="space-y-1" onClick={closeSidebar}>
+              <SidebarLink href="/integracion-numerica">
+                Panel de Integración
+              </SidebarLink>
               <SidebarLink href="/integracion-numerica/trapecio">
                 Regla del Trapecio (Sesión 12)
+              </SidebarLink>
+              <SidebarLink href="/integracion-numerica/simpson-1-3">
+                Simpson 1/3 Compuesto (Sesión 13)
+              </SidebarLink>
+              <SidebarLink href="/integracion-numerica/simpson-3-8">
+                Simpson 3/8 (Sesión 13)
               </SidebarLink>
             </div>
           </div>
