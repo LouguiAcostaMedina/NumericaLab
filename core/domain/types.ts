@@ -508,3 +508,99 @@ export interface SimpsonMethodResponse {
   errorMessage?: string;
   semanticValidation?: SemanticValidationResult;
 }
+
+
+// ============================================================================
+// Tipos para Ecuaciones Diferenciales Ordinarias (EDO - PVI, Sesión 14)
+// ============================================================================
+
+export type OdeMethodType = 'euler' | 'heun' | 'rk3' | 'rk4';
+
+export type OdeEquationMode = 'derivative' | 'differential'; // y' = f(x, y) vs M(x, y)dx + N(x, y)dy = 0
+
+export interface OdeHeunStepDetail {
+  yPredictor: number;             // y_{i+1}^{(0)} = y_i + h * f(x_i, y_i)
+  slopeInitial: number;           // f(x_i, y_i)
+  slopePredictor: number;         // f(x_{i+1}, y_{i+1}^{(0)})
+  slopeAverage: number;           // (slopeInitial + slopePredictor) / 2
+}
+
+export interface OdeRk3StepDetail {
+  k1: number;                     // f(x_i, y_i)
+  k2: number;                     // f(x_i + h/2, y_i + (h/2)*k1)
+  k3: number;                     // f(x_i + h, y_i - h*k1 + 2*h*k2)
+  weightedSlope: number;          // (k1 + 4*k2 + k3) / 6
+}
+
+export interface OdeRk4StepDetail {
+  k1: number;                     // f(x_i, y_i)
+  k2: number;                     // f(x_i + h/2, y_i + (h/2)*k1)
+  k3: number;                     // f(x_i + h/2, y_i + (h/2)*k2)
+  k4: number;                     // f(x_i + h, y_i + h*k3)
+  weightedSlope: number;          // (k1 + 2*k2 + 2*k3 + k4) / 6
+}
+
+export interface OdeStepDetail {
+  step: number;                   // i (0, 1, 2, ...)
+  x: number;                      // x_i
+  y: number;                      // y_i
+  h: number;                      // Paso efectivo usado en este tramo
+  slope: number;                  // Pendiente efectiva que multiplicó a h (phi)
+  yNext: number;                  // y_{i+1}
+  isPartialStep?: boolean;        // true si es el último tramo parcial para alcanzar xTarget
+  exactValue?: number;            // y_exacto(x_i)
+  absoluteError?: number;         // |y_exacto(x_i) - y_i|
+  relativeErrorPercent?: number;  // (|y_exacto - y_i| / |y_exacto|) * 100% (solo si |y_exacto| > 0)
+  isExactZero?: boolean;          // true si y_exacto es 0 y el error relativo no está definido
+
+  // Detalles específicos por método para máxima transparencia pedagógica
+  heunDetail?: OdeHeunStepDetail;
+  rk3Detail?: OdeRk3StepDetail;
+  rk4Detail?: OdeRk4StepDetail;
+}
+
+export interface OdeMethodResult {
+  methodType: OdeMethodType;
+  methodName: string;
+  order: number;
+  evaluationsPerStep: number;
+  totalEvaluations: number;
+  steps: OdeStepDetail[];
+  finalY: number;
+  finalExact?: number;
+  finalAbsError?: number;
+  finalRelErrorPercent?: number;
+  manualProcedure?: ProcedureStep[];
+}
+
+export interface OdeComparisonRow {
+  methodType: OdeMethodType;
+  methodName: string;
+  order: number;
+  approxValue: number;
+  absoluteError?: number;
+  relativeErrorPercent?: number;
+  evaluationsPerStep: number;
+  totalEvaluations: number;
+}
+
+export interface OdeCalculationResponse {
+  success: boolean;
+  equationMode: OdeEquationMode;
+  expressionF: string;
+  expressionM?: string;
+  expressionN?: string;
+  x0: number;
+  y0: number;
+  xTarget: number;
+  nominalH: number;
+  totalSteps: number;
+  stepAdjustmentMode?: 'exact_n' | 'partial_last_step';
+  exactExpression?: string;
+  exactDerivationExplanation?: string;
+  results: Partial<Record<OdeMethodType, OdeMethodResult>>;
+  comparisonTable: OdeComparisonRow[];
+  curvePointsExact?: { x: number; y: number }[];
+  errorMessage?: string;
+  semanticValidation?: SemanticValidationResult;
+}

@@ -48,6 +48,9 @@ export class MathParser {
     // Multiplicación implícita entre constantes y variables (ej: 2x -> 2*x, 3.5z -> 3.5*z)
     expr = expr.replace(/(\d+(\.\d+)?)\s*([a-zA-Z])/g, '$1*$3');
 
+    // Multiplicación implícita entre variables x e y (ej: xy -> x*y, yx -> y*x, x y -> x*y)
+    expr = expr.replace(/\b([xy])\s*([xy])\b/g, '$1*$2');
+
     // Multiplicación implícita entre variables y paréntesis (ej: x(x-1) -> x*(x-1))
     expr = expr.replace(/([a-zA-Z0-9_]+)\s*\(/g, (match, p1) => {
       // Si p1 es el nombre de una función conocida (sin, cos, exp, log, sqrt), no insertar *

@@ -173,6 +173,56 @@ export default function Home() {
           />
         </div>
       </section>
+
+      {/* Category: Ecuaciones Diferenciales Ordinarias */}
+      <section className="space-y-6">
+        <div className="border-b border-border pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground">Ecuaciones Diferenciales Ordinarias (EDO)</h2>
+            <p className="text-sm text-foreground-muted mt-1">
+              Problemas de Valor Inicial (PVI) de primer orden y&apos; = f(x, y) y M(x,y)dx + N(x,y)dy = 0 (Sesión 14)
+            </p>
+          </div>
+          <Link
+            href="/edo-pvi"
+            className="text-xs font-bold text-primary hover:underline flex items-center gap-1 self-start sm:self-auto"
+          >
+            <span>Abrir Módulo PVI</span>
+            <span>→</span>
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <MethodCard 
+            title="Método de Euler"
+            description="Aproximación por recta tangente (orden 1). Base de los métodos de un paso para EDOs."
+            icon="📐"
+            href="/edo-pvi"
+            isNew
+          />
+          <MethodCard 
+            title="Euler Mejorado (Heun)"
+            description="Método predictor-corrector (orden 2). Promedia la pendiente inicial y la estimada al final del intervalo."
+            icon="⚡"
+            href="/edo-pvi"
+            isNew
+          />
+          <MethodCard 
+            title="Runge-Kutta 3 (RK3)"
+            description="Fórmula de orden 3 (Diapositiva 31) con ponderación (k₁ + 4k₂ + k₃)/6. Alta precisión sin calcular derivadas superiores."
+            icon="📊"
+            href="/edo-pvi"
+            isNew
+          />
+          <MethodCard 
+            title="Runge-Kutta 4 (RK4)"
+            description="Estándar clásico de orden 4 (Diapositiva 33). Combina 4 estimaciones de pendiente con error local O(h⁵)."
+            icon="🎯"
+            href="/edo-pvi"
+            isNew
+          />
+        </div>
+      </section>
       
       {/* Help / Instructions Footer */}
       <section className="bg-surface-secondary rounded-xl p-6 border border-border text-sm">
@@ -183,7 +233,8 @@ export default function Home() {
           <li>Selecciona el tipo de problema a resolver en las categorías superiores.</li>
           <li>Usa notación estándar matemática (ej: <code className="font-mono text-xs bg-surface px-1.5 py-0.5 rounded border border-border">sin(x) - x/2</code>) para las funciones.</li>
           <li>En integración numérica, Simpson 1/3 exige <strong>n par</strong> y Simpson 3/8 exige <strong>n divisible por 3</strong>.</li>
-          <li>Todos los resultados detallan paso a paso el procedimiento numérico y análisis de convergencia.</li>
+          <li>En EDOs (PVI), puedes ingresar derivadas directas <code className="font-mono text-xs bg-surface px-1.5 py-0.5 rounded border border-border">y&apos; = f(x, y)</code> o diferenciales <code className="font-mono text-xs bg-surface px-1.5 py-0.5 rounded border border-border">M dx + N dy = 0</code>.</li>
+          <li>Todos los resultados detallan paso a paso el procedimiento numérico, tablas comparativas y gráficas interactivas.</li>
         </ul>
       </section>
 

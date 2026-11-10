@@ -169,6 +169,17 @@ export function Sidebar() {
               </SidebarLink>
             </div>
           </div>
+
+          <div>
+            <p className="px-2 text-[10px] font-bold text-foreground-muted uppercase tracking-widest mb-3">
+              Ecuaciones Diferenciales
+            </p>
+            <div className="space-y-1" onClick={closeSidebar}>
+              <SidebarLink href="/edo-pvi">
+                PVI (Euler, Heun, RK3, RK4)
+              </SidebarLink>
+            </div>
+          </div>
         </nav>
 
         {/* Sidebar Footer */}
