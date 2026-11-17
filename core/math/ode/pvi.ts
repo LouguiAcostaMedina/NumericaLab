@@ -115,6 +115,38 @@ export const ODE_PRACTICE_PRESETS = {
     exactDerivationExplanation:
       'Ecuación separable: y\' = e^x e^y ⇒ e^(-y) dy = e^x dx. Integrando: -e^(-y) = e^x + C. Con y(1) = 0 ⇒ -e⁰ = e¹ + C ⇒ -1 = e + C ⇒ C = -(1 + e). Por tanto: e^(-y) = 1 + e - e^x ⇒ y(x) = -ln(1 + e - e^x).',
   },
+  examen3_h02: {
+    title: 'Examen 3 (Problema 2): x dy - (2x + y)dx = 0, y(1) = 1 (h = 0.2)',
+    equationMode: 'differential' as OdeEquationMode,
+    expressionM: '-(2*x + y)',
+    expressionN: 'x',
+    expressionF: '(2*x + y)/x',
+    x0: 1.0,
+    y0: 1.0,
+    xTarget: 2.6,
+    h: 0.2,
+    selectedMethods: ['euler', 'heun', 'rk3', 'rk4'] as OdeMethodType[],
+    stepAdjustmentMode: 'exact_n' as const,
+    exactExpression: 'x * (2 * log(x) + 1)',
+    exactDerivationExplanation:
+      'Ecuación diferencial: x dy - (2x + y) dx = 0 ⟹ dy/dx = (2x + y)/x = 2 + y/x. En forma lineal: y\' - (1/x)y = 2. Factor integrante μ(x) = e^∫(-1/x)dx = 1/x. Multiplicando: d/dx[y/x] = 2/x ⟹ y/x = 2 ln|x| + C ⟹ y(x) = x(2 ln|x| + C). Imponiendo condición inicial y(1) = 1: 1 = 1(2 ln(1) + C) ⟹ C = 1. Solución analítica exacta: y(x) = x(2 ln(x) + 1). Evaluando en x = 2.6: y(2.6) = 2.6 · (2 ln(2.6) + 1) ≈ 7.568659515 (concuerda con la referencia analítica 7.568659).',
+  },
+  examen3_h01: {
+    title: 'Examen 3 (Problema 2 con h/2): x dy - (2x + y)dx = 0, y(1) = 1 (h = 0.1)',
+    equationMode: 'differential' as OdeEquationMode,
+    expressionM: '-(2*x + y)',
+    expressionN: 'x',
+    expressionF: '(2*x + y)/x',
+    x0: 1.0,
+    y0: 1.0,
+    xTarget: 2.6,
+    h: 0.1,
+    selectedMethods: ['euler', 'heun', 'rk3', 'rk4'] as OdeMethodType[],
+    stepAdjustmentMode: 'exact_n' as const,
+    exactExpression: 'x * (2 * log(x) + 1)',
+    exactDerivationExplanation:
+      'Validación con paso h/2 = 0.1 (16 pasos). Al comparar el error relativo de RK4 con h = 0.2 (0.000792%) vs h = 0.1 (0.000053%), el error se reduce en un factor de 14.96 ≈ 16 = 2^4, confirmando empíricamente el orden de convergencia 4 de RK4.',
+  },
 };
 
 /**
@@ -817,3 +849,4 @@ export function solveOdePvi(options: OdeCalculationOptions): OdeCalculationRespo
     curvePointsExact: curvePointsExact.length > 0 ? curvePointsExact : undefined,
   };
 }
+

@@ -320,4 +320,99 @@ describe('Ecuaciones Diferenciales Ordinarias (EDO - PVI, Sesión 14)', () => {
       expect(resp.results.euler?.finalY).toBeCloseTo(0.25, 9);
     });
   });
+
+  describe('Casos de Prueba del Examen 3 (Problema 2 - PVI)', () => {
+    it('debe resolver el Problema 2 con h = 0.2 y contrastar con la respuesta analítica y(2.6) ≈ 7.568659', () => {
+      const resp = solveOdePvi({
+        equationMode: 'differential',
+        expressionM: '-(2*x + y)',
+        expressionN: 'x',
+        x0: 1.0,
+        y0: 1.0,
+        xTarget: 2.6,
+        h: 0.2,
+        selectedMethods: ['euler', 'heun', 'rk3', 'rk4'],
+        stepAdjustmentMode: 'exact_n',
+        exactExpression: 'x * (2 * log(x) + 1)',
+      });
+
+      expect(resp.success).toBe(true);
+      expect(resp.totalSteps).toBe(8);
+
+      const exactVal = resp.results.rk4?.finalExact;
+      expect(exactVal).toBeCloseTo(7.568659515, 6);
+
+      // RK4 con h = 0.2
+      const rk4Res = resp.results.rk4;
+      expect(rk4Res).toBeDefined();
+      expect(rk4Res?.finalY).toBeCloseTo(7.5685996, 6);
+      expect(rk4Res?.finalRelErrorPercent).toBeLessThan(0.001); // < 0.001%
+
+      // Heun con h = 0.2
+      const heunRes = resp.results.heun;
+      expect(heunRes).toBeDefined();
+      expect(heunRes?.finalY).toBeCloseTo(7.5422972, 5);
+
+      // Euler con h = 0.2
+      const eulerRes = resp.results.euler;
+      expect(eulerRes).toBeDefined();
+      expect(eulerRes?.finalY).toBeCloseTo(7.2633622, 5);
+    });
+
+    it('debe validar la reducción de error al pasar de h = 0.2 a h/2 = 0.1 confirmando el orden del método', () => {
+      const respH = solveOdePvi({
+        equationMode: 'differential',
+        expressionM: '-(2*x + y)',
+        expressionN: 'x',
+        x0: 1.0,
+        y0: 1.0,
+        xTarget: 2.6,
+        h: 0.2,
+        selectedMethods: ['euler', 'heun', 'rk3', 'rk4'],
+        stepAdjustmentMode: 'exact_n',
+        exactExpression: 'x * (2 * log(x) + 1)',
+      });
+
+      const respH2 = solveOdePvi({
+        equationMode: 'differential',
+        expressionM: '-(2*x + y)',
+        expressionN: 'x',
+        x0: 1.0,
+        y0: 1.0,
+        xTarget: 2.6,
+        h: 0.1,
+        selectedMethods: ['euler', 'heun', 'rk3', 'rk4'],
+        stepAdjustmentMode: 'exact_n',
+        exactExpression: 'x * (2 * log(x) + 1)',
+      });
+
+      expect(respH.success).toBe(true);
+      expect(respH2.success).toBe(true);
+
+      const errRk4_h = respH.results.rk4?.finalAbsError!;
+      const errRk4_h2 = respH2.results.rk4?.finalAbsError!;
+      const factorRk4 = errRk4_h / errRk4_h2;
+
+      // El factor de reducción para RK4 al reducir el paso a la mitad debe ser ≈ 16 (2^4)
+      expect(factorRk4).toBeGreaterThan(14.0);
+      expect(factorRk4).toBeLessThan(16.5);
+
+      const errRk3_h = respH.results.rk3?.finalAbsError!;
+      const errRk3_h2 = respH2.results.rk3?.finalAbsError!;
+      const factorRk3 = errRk3_h / errRk3_h2;
+
+      // El factor de reducción para RK3 al reducir el paso a la mitad debe ser ≈ 8 (2^3)
+      expect(factorRk3).toBeGreaterThan(7.0);
+      expect(factorRk3).toBeLessThan(8.5);
+
+      const errHeun_h = respH.results.heun?.finalAbsError!;
+      const errHeun_h2 = respH2.results.heun?.finalAbsError!;
+      const factorHeun = errHeun_h / errHeun_h2;
+
+      // El factor de reducción para Heun (orden 2) debe ser ≈ 4 (2^2)
+      expect(factorHeun).toBeGreaterThan(3.5);
+      expect(factorHeun).toBeLessThan(4.5);
+    });
+  });
 });
+

@@ -44,12 +44,13 @@ export function Sidebar() {
 
       {/* Sidebar Navigation */}
       <aside
+        suppressHydrationWarning
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-surface border-r border-border flex flex-col h-full transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Desktop Sidebar Header */}
-        <div className="hidden lg:flex h-16 items-center px-6 border-b border-border bg-background">
+        <div suppressHydrationWarning className="hidden lg:flex h-16 items-center px-6 border-b border-border bg-background">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl text-foreground tracking-tight">
             <span className="text-primary text-2xl font-serif">∫</span>
             <span>NuméricaLab<span className="text-primary">.</span></span>
@@ -57,7 +58,7 @@ export function Sidebar() {
         </div>
 
         {/* Mobile Sidebar Logo (visible only when drawer is open) */}
-        <div className="flex lg:hidden h-16 items-center justify-between px-6 border-b border-border bg-background">
+        <div suppressHydrationWarning className="flex lg:hidden h-16 items-center justify-between px-6 border-b border-border bg-background">
           <span className="font-bold text-lg text-foreground tracking-tight">Menú</span>
           <button onClick={closeSidebar} className="text-foreground-muted hover:text-foreground">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,7 +68,7 @@ export function Sidebar() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-8">
+        <nav suppressHydrationWarning className="flex-1 overflow-y-auto px-4 py-6 space-y-8">
           <div>
             <p className="px-2 text-[10px] font-bold text-foreground-muted uppercase tracking-widest mb-3">
               Inicio

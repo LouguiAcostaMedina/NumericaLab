@@ -278,5 +278,64 @@ describe('Integración Numérica - Regla de Simpson 1/3 y Simpson 3/8 (Sesión 1
       expect(PRACTICE_PRESETS.expX.b).toBe(1);
       expect(PRACTICE_PRESETS.sqrtRational.n).toBe(8);
     });
+
+    describe('Casos de Prueba del Examen 3 (Problema 1 - Rack de Servidores)', () => {
+      it('debe calcular Tramo 1 [0, 30] min con Simpson 1/3 compuesto: I₁ = 4423.333333 kW·min', () => {
+        const resp1 = calculateSimpsonIntegration({
+          methodType: 'simpson13',
+          isTabular: true,
+          tabularPoints: [
+            { x: 0, y: 120 },
+            { x: 5, y: 134 },
+            { x: 10, y: 151 },
+            { x: 15, y: 163 },
+            { x: 20, y: 158 },
+            { x: 25, y: 147 },
+            { x: 30, y: 140 },
+          ],
+          n: 6,
+          variableName: 't',
+          units: { rateUnit: 'kW', integralUnit: 'kW·min', variableUnit: 'min' },
+        });
+
+        expect(resp1.success).toBe(true);
+        expect(resp1.Sn).toBeCloseTo(4423.333333333, 6);
+        expect(resp1.nodes.length).toBe(7);
+        expect(resp1.h).toBe(5);
+      });
+
+      it('debe calcular Tramo 2 [30, 60] min con Simpson 3/8 simple: I₂ = 4777.5 kW·min', () => {
+        const resp2 = calculateSimpsonIntegration({
+          methodType: 'simpson38',
+          isTabular: true,
+          tabularPoints: [
+            { x: 30, y: 140 },
+            { x: 40, y: 152 },
+            { x: 50, y: 171 },
+            { x: 60, y: 165 },
+          ],
+          n: 3,
+          variableName: 't',
+          units: { rateUnit: 'kW', integralUnit: 'kW·min', variableUnit: 'min' },
+        });
+
+        expect(resp2.success).toBe(true);
+        expect(resp2.Sn).toBeCloseTo(4777.5, 6);
+        expect(resp2.nodes.length).toBe(4);
+        expect(resp2.h).toBe(10);
+      });
+
+      it('debe calcular la energía total en kWh y la potencia promedio en kW', () => {
+        const I1 = 4423.333333333333;
+        const I2 = 4777.5;
+        const total_kW_min = I1 + I2;
+        const E_kWh = total_kW_min / 60; // 60 minutos en una hora
+        const P_prom_kW = total_kW_min / 60; // E / 1 hora
+
+        expect(total_kW_min).toBeCloseTo(9200.833333333, 6);
+        expect(E_kWh).toBeCloseTo(153.347222222, 6);
+        expect(P_prom_kW).toBeCloseTo(153.347222222, 6);
+      });
+    });
   });
 });

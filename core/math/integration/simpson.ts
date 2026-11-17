@@ -94,6 +94,75 @@ export const SIMPSON38_TABULAR_PRESET = {
 };
 
 /**
+ * Presets Oficiales del Examen 3 (Problema 1 - Rack de Servidores P(t))
+ * Datos:
+ * t (min):    0,   5,  10,  15,  20,  25,  30,   40,   50,   60
+ * P(t) (kW): 120, 134, 151, 163, 158, 147, 140,  152,  171,  165
+ */
+export const EXAMEN3_P1_TRAMO1_PRESET = {
+  title: 'Examen 3 (Prob 1 - Tramo [0, 30] min, h = 5 min)',
+  methodType: 'simpson13' as SimpsonMethodType,
+  isTabular: true,
+  points: [
+    { x: 0, y: 120 },
+    { x: 5, y: 134 },
+    { x: 10, y: 151 },
+    { x: 15, y: 163 },
+    { x: 20, y: 158 },
+    { x: 25, y: 147 },
+    { x: 30, y: 140 },
+  ],
+  a: 0,
+  b: 30,
+  n: 6,
+  variableName: 't',
+  units: {
+    rateUnit: 'kW',
+    integralUnit: 'kW·min',
+    variableUnit: 'min',
+  },
+  expectedValue: 4423.333333333333,
+  description:
+    'Primera media hora: h = 5 min, n = 6 subintervalos (par). Regla elegida: Simpson 1/3 compuesto. Suma ponderada [1, 4, 2, 4, 2, 4, 1] = 2654. I₁ = (5/3)·2654 = 4423.333333 kW·min.',
+};
+
+export const EXAMEN3_P1_TRAMO2_PRESET = {
+  title: 'Examen 3 (Prob 1 - Tramo [30, 60] min, h = 10 min)',
+  methodType: 'simpson38' as SimpsonMethodType,
+  isTabular: true,
+  points: [
+    { x: 30, y: 140 },
+    { x: 40, y: 152 },
+    { x: 50, y: 171 },
+    { x: 60, y: 165 },
+  ],
+  a: 30,
+  b: 60,
+  n: 3,
+  variableName: 't',
+  units: {
+    rateUnit: 'kW',
+    integralUnit: 'kW·min',
+    variableUnit: 'min',
+  },
+  expectedValue: 4777.5,
+  description:
+    'Segunda media hora: h = 10 min, n = 3 subintervalos (múltiplo de 3). Regla elegida: Simpson 3/8 simple. Suma ponderada [1, 3, 3, 1] = 1274. I₂ = (3·10/8)·1274 = 4777.500000 kW·min.',
+};
+
+export const EXAMEN3_P1_GLOBAL_SUMMARY = {
+  i1_kW_min: 4423.333333333333,
+  i2_kW_min: 4777.5,
+  total_kW_min: 9200.833333333334,
+  total_kWh: 153.34722222222223,
+  potencia_promedio_kW: 153.34722222222223,
+  duracion_min: 60,
+  duracion_horas: 1.0,
+  justificacion:
+    'No se puede aplicar una sola regla de Simpson en todo el intervalo [0, 60] porque el registrador cambió el paso de muestreo en t = 30 min (h₁ = 5 min en [0, 30] y h₂ = 10 min en [30, 60]). Las fórmulas de Simpson requieren que los datos estén igualmente espaciados con paso h constante. Por ello se dividió la integral en dos tramos: Simpson 1/3 compuesto en [0, 30] (n = 6 par) y Simpson 3/8 en [30, 60] (n = 3 múltiplo de 3).',
+};
+
+/**
  * Presets de práctica de la guía teórica
  */
 export const PRACTICE_PRESETS = {

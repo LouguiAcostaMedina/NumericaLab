@@ -122,7 +122,15 @@ export function OdeForm({ isLoading, onSubmit }: OdeFormProps) {
   }, [equationMode, expressionF, expressionM, expressionN, hasExact, exactExpr]);
 
   // Selección de presets
-  const applyPreset = (presetKey: 'autonomous' | 'ejemplo1' | 'ejemplo2' | 'ejemplo3') => {
+  const applyPreset = (
+    presetKey:
+      | 'autonomous'
+      | 'ejemplo1'
+      | 'ejemplo2'
+      | 'ejemplo3'
+      | 'examen3_h02'
+      | 'examen3_h01'
+  ) => {
     if (presetKey === 'autonomous') {
       setEquationMode('differential');
       setExpressionM('y^2 - x^2');
@@ -143,8 +151,14 @@ export function OdeForm({ isLoading, onSubmit }: OdeFormProps) {
     const pr = ODE_PRACTICE_PRESETS[presetKey];
     if (!pr) return;
 
-    setEquationMode('derivative');
-    setExpressionF(pr.expressionF);
+    setEquationMode(pr.equationMode || 'derivative');
+    if (pr.equationMode === 'differential' && 'expressionM' in pr && 'expressionN' in pr) {
+      setExpressionM((pr.expressionM as string) || '');
+      setExpressionN((pr.expressionN as string) || '');
+      setExpressionF(pr.expressionF || '');
+    } else {
+      setExpressionF(pr.expressionF);
+    }
     setX0Str(pr.x0.toString());
     setY0Str(pr.y0.toString());
     setXTargetStr(pr.xTarget.toString());
@@ -234,10 +248,58 @@ export function OdeForm({ isLoading, onSubmit }: OdeFormProps) {
   return (
     <div className="bg-surface/90 backdrop-blur-md rounded-2xl p-6 border border-border shadow-xl space-y-6">
       {/* Selector de Presets de la Guía y Actividad */}
-      <div>
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+      <div className="space-y-3">
+        {/* Sección Especial: Examen 3 */}
+        <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+              <span>📋</span>
+              <span>Casos de Prueba: Examen 3 (Problema 2 - PVI)</span>
+            </span>
+            <span className="text-[10px] bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded font-mono font-bold">
+              Listo para Probar
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => applyPreset('examen3_h02')}
+              className="text-left p-3 rounded-lg border border-emerald-500/40 bg-surface hover:bg-emerald-500/10 transition-all text-xs space-y-1 shadow-sm"
+            >
+              <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+                <span>📝 Examen 3: Paso h = 0.2</span>
+                <span className="text-[10px] font-mono">n = 8 pasos</span>
+              </div>
+              <p className="text-foreground text-[11px] font-mono truncate">
+                x dy - (2x + y)dx = 0, y(1) = 1
+              </p>
+              <p className="text-foreground-muted text-[10px]">
+                x_obj = 2.6, h = 0.2 • Exacta: y(2.6) ≈ 7.568659
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => applyPreset('examen3_h01')}
+              className="text-left p-3 rounded-lg border border-emerald-500/40 bg-surface hover:bg-emerald-500/10 transition-all text-xs space-y-1 shadow-sm"
+            >
+              <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+                <span>🔍 Examen 3: Validación h/2 = 0.1</span>
+                <span className="text-[10px] font-mono">n = 16 pasos</span>
+              </div>
+              <p className="text-foreground text-[11px] font-mono truncate">
+                Compara reducción de error (Factor ≈ 16 en RK4)
+              </p>
+              <p className="text-foreground-muted text-[10px]">
+                x_obj = 2.6, h = 0.1 • Responde pregunta de comprensión
+              </p>
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
           <span className="text-xs font-bold text-foreground-muted uppercase tracking-wider">
-            Casos y Ejemplos de Estudio (Sesión 14)
+            Casos de Guía y Sesión 14
           </span>
           <span className="text-[11px] text-primary font-medium">1 clic para autocompletar</span>
         </div>

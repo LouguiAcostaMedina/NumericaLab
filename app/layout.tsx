@@ -18,18 +18,47 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`h-full antialiased ${inter.variable} ${firaCode.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var clean = function(el) {
+                    if (el && el.nodeType === 1) {
+                      if (el.hasAttribute('bis_skin_checked')) el.removeAttribute('bis_skin_checked');
+                      var ch = el.children;
+                      for (var i = 0; i < ch.length; i++) clean(ch[i]);
+                    }
+                  };
+                  clean(document.documentElement);
+                  var obs = new MutationObserver(function(mutations) {
+                    for (var i = 0; i < mutations.length; i++) {
+                      var m = mutations[i];
+                      if (m.type === 'attributes' && m.attributeName === 'bis_skin_checked' && m.target) {
+                        m.target.removeAttribute('bis_skin_checked');
+                      }
+                    }
+                  });
+                  obs.observe(document.documentElement, { attributes: true, subtree: true, attributeFilter: ['bis_skin_checked'] });
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="h-full bg-background text-foreground font-sans flex flex-col lg:flex-row overflow-hidden" suppressHydrationWarning>
         {/* Subtle background animation */}
-        <div className="bg-math-mesh"></div>
+        <div className="bg-math-mesh" suppressHydrationWarning></div>
         
         {/* Sidebar Component (Handles both Mobile Header/Drawer and Desktop Sidebar) */}
         <Sidebar />
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+        <div className="flex-1 flex flex-col h-full overflow-hidden relative" suppressHydrationWarning>
           
           {/* Main Topbar (Desktop) */}
-          <header className="hidden lg:flex h-16 border-b border-border items-center justify-between px-8 bg-surface/80 backdrop-blur-md flex-shrink-0 z-10 sticky top-0">
+          <header className="hidden lg:flex h-16 border-b border-border items-center justify-between px-8 bg-surface/80 backdrop-blur-md flex-shrink-0 z-10 sticky top-0" suppressHydrationWarning>
             <h2 className="text-sm font-semibold text-foreground-muted">
               Analizador Numérico v2.0
             </h2>
@@ -41,8 +70,8 @@ export default function RootLayout({
           </header>
 
           {/* Page Container */}
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative w-full">
-            <div className="max-w-6xl mx-auto space-y-8 w-full">
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative w-full" suppressHydrationWarning>
+            <div className="max-w-6xl mx-auto space-y-8 w-full" suppressHydrationWarning>
               {children}
             </div>
           </main>

@@ -6,6 +6,9 @@ import {
   SIMPSON13_AUTONOMOUS_PRESET,
   SIMPSON38_TABULAR_PRESET,
   PRACTICE_PRESETS,
+  EXAMEN3_P1_TRAMO1_PRESET,
+  EXAMEN3_P1_TRAMO2_PRESET,
+  EXAMEN3_P1_GLOBAL_SUMMARY,
 } from '../../core/math/integration/simpson';
 import { SimpsonMethodType } from '../../core/domain/types';
 
@@ -199,6 +202,50 @@ export function SimpsonForm({
     setVariableUnit('m');
   };
 
+  const loadExamen3Tramo1 = () => {
+    setMethodType('simpson13');
+    setIsTabular(true);
+    setTabularPoints(
+      EXAMEN3_P1_TRAMO1_PRESET.points.map((p, idx) => ({
+        id: String(idx + 1),
+        x: String(p.x),
+        y: String(p.y),
+      }))
+    );
+    setN(EXAMEN3_P1_TRAMO1_PRESET.n.toString());
+    setVariableName('t');
+    setRateUnit('kW');
+    setIntegralUnit('kW·min');
+    setVariableUnit('min');
+    setHasExactReference(true);
+    setExactValueStr(EXAMEN3_P1_TRAMO1_PRESET.expectedValue.toFixed(6));
+    setExactDescription(
+      'I_1 = \\frac{5}{3}[120 + 4(134) + 2(151) + 4(163) + 2(158) + 4(147) + 140] = 4423.333333 \\text{ kW}\\cdot\\text{min}'
+    );
+  };
+
+  const loadExamen3Tramo2 = () => {
+    setMethodType('simpson38');
+    setIsTabular(true);
+    setTabularPoints(
+      EXAMEN3_P1_TRAMO2_PRESET.points.map((p, idx) => ({
+        id: String(idx + 1),
+        x: String(p.x),
+        y: String(p.y),
+      }))
+    );
+    setN(EXAMEN3_P1_TRAMO2_PRESET.n.toString());
+    setVariableName('t');
+    setRateUnit('kW');
+    setIntegralUnit('kW·min');
+    setVariableUnit('min');
+    setHasExactReference(true);
+    setExactValueStr(EXAMEN3_P1_TRAMO2_PRESET.expectedValue.toFixed(6));
+    setExactDescription(
+      'I_2 = \\frac{3(10)}{8}[140 + 3(152) + 3(171) + 165] = 4777.500000 \\text{ kW}\\cdot\\text{min}'
+    );
+  };
+
   const loadPracticePreset = (key: keyof typeof PRACTICE_PRESETS) => {
     const p = PRACTICE_PRESETS[key];
     setIsTabular(false);
@@ -317,9 +364,72 @@ export function SimpsonForm({
       </div>
 
       {/* Presets Rápidos */}
-      <div className="space-y-2">
-        <label className="text-xs font-semibold text-foreground-muted uppercase tracking-wider block">
-          Casos Predefinidos y Guía
+      <div className="space-y-3">
+        {/* Sección Especial: Examen 3 (Problema 1 - Rack de Servidores) */}
+        <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+              <span>📋</span>
+              <span>Casos de Prueba: Examen 3 (Problema 1 - Rack de Servidores)</span>
+            </span>
+            <span className="text-[10px] bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded font-mono font-bold">
+              Subintervalos Combinados
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={loadExamen3Tramo1}
+              className="text-left p-2.5 rounded-lg border border-emerald-500/40 bg-surface hover:bg-emerald-500/10 transition-all text-xs space-y-1 shadow-sm"
+            >
+              <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+                <span>⚡ Tramo 1: [0, 30] min (h = 5 min)</span>
+                <span className="text-[10px] font-mono">Simpson 1/3</span>
+              </div>
+              <p className="text-foreground text-[11px] font-mono truncate">
+                7 puntos: P = [120, 134, 151, 163, 158, 147, 140]
+              </p>
+              <p className="text-foreground-muted text-[10px]">
+                I₁ = (5/3)·2654 = 4423.333333 kW·min
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={loadExamen3Tramo2}
+              className="text-left p-2.5 rounded-lg border border-emerald-500/40 bg-surface hover:bg-emerald-500/10 transition-all text-xs space-y-1 shadow-sm"
+            >
+              <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+                <span>⚡ Tramo 2: [30, 60] min (h = 10 min)</span>
+                <span className="text-[10px] font-mono">Simpson 3/8</span>
+              </div>
+              <p className="text-foreground text-[11px] font-mono truncate">
+                4 puntos: P = [140, 152, 171, 165]
+              </p>
+              <p className="text-foreground-muted text-[10px]">
+                I₂ = (30/8)·1274 = 4777.500000 kW·min
+              </p>
+            </button>
+          </div>
+
+          <div className="p-2.5 rounded-lg bg-surface/70 border border-border text-[11px] space-y-1 font-mono text-foreground">
+            <div className="flex justify-between font-bold text-primary">
+              <span>Energía Total (I₁ + I₂):</span>
+              <span>9200.833333 kW·min = 153.347222 kWh</span>
+            </div>
+            <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+              <span>Potencia Promedio (1 hora):</span>
+              <span>153.347222 kW</span>
+            </div>
+            <p className="text-[10px] text-foreground-muted font-sans pt-1 border-t border-border/50">
+              💡 <strong>Pregunta de comprensión:</strong> No se puede usar una sola regla en [0, 60] porque el paso de muestreo cambió de h=5 min a h=10 min a los 30 min. Newton-Cotes cerrado exige espaciamiento constante.
+            </p>
+          </div>
+        </div>
+
+        <label className="text-xs font-semibold text-foreground-muted uppercase tracking-wider block pt-1">
+          Casos Predefinidos y Guía (Sesión 13)
         </label>
         <div className="flex flex-wrap gap-2">
           <button
